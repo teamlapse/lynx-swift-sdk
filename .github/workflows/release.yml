@@ -35,7 +35,7 @@ jobs:
 
       - name: Update Podfile versions
         run: |
-          cd workspace
+          cd builder
           sed -i '' "s/pod 'Lynx', '[^']*'/pod 'Lynx', '${{ inputs.lynx_version }}'/" Podfile
           sed -i '' "s/pod 'PrimJS', '[^']*'/pod 'PrimJS', '${{ inputs.primjs_version }}'/" Podfile
           sed -i '' "s/pod 'LynxService', '[^']*'/pod 'LynxService', '${{ inputs.lynx_service_version }}'/" Podfile
@@ -53,7 +53,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add workspace/Podfile
+          git add builder/Podfile
           git add XCFrameworks/
           git commit -m "Update Lynx to ${{ inputs.release_tag }}
 

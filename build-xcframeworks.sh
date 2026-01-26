@@ -2,11 +2,11 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-WORKSPACE_DIR="$SCRIPT_DIR/workspace"
-WORKSPACE="$WORKSPACE_DIR/LynxFrameworkBuilder.xcworkspace"
+BUILDER_DIR="$SCRIPT_DIR/builder"
+XCODE_WORKSPACE="$BUILDER_DIR/LynxFrameworkBuilder.xcworkspace"
 OUTPUT_DIR="$SCRIPT_DIR/XCFrameworks"
 STAMP_FILE="$OUTPUT_DIR/.build_stamp"
-PODFILE="$WORKSPACE_DIR/Podfile"
+PODFILE="$BUILDER_DIR/Podfile"
 
 FRAMEWORKS="Lynx LynxBase LynxServiceAPI PrimJS LynxService XElement LynxDevtool BaseDevtool DebugRouter SocketRocket"
 
@@ -33,7 +33,7 @@ fi
 
 echo "Building LynxJS XCFrameworks..."
 
-cd "$WORKSPACE_DIR"
+cd "$BUILDER_DIR"
 
 # Always run pod install to ensure deps are current
 echo "Running pod install..."
@@ -45,18 +45,18 @@ mkdir -p "$OUTPUT_DIR"
 
 # Build for iOS Device
 echo "Building for iOS..."
-xcodebuild -workspace "$WORKSPACE" -scheme Pods-LynxFrameworkBuilder \
+xcodebuild -workspace "$XCODE_WORKSPACE" -scheme Pods-LynxFrameworkBuilder \
     -configuration Release -destination "generic/platform=iOS" \
     BUILD_LIBRARY_FOR_DISTRIBUTION=YES CODE_SIGNING_ALLOWED=NO build -quiet
 
 # Build for iOS Simulator
 echo "Building for Simulator..."
-xcodebuild -workspace "$WORKSPACE" -scheme Pods-LynxFrameworkBuilder \
+xcodebuild -workspace "$XCODE_WORKSPACE" -scheme Pods-LynxFrameworkBuilder \
     -configuration Release -destination "generic/platform=iOS Simulator" \
     BUILD_LIBRARY_FOR_DISTRIBUTION=YES CODE_SIGNING_ALLOWED=NO build -quiet
 
 # Find DerivedData path
-DERIVED_DATA=$(xcodebuild -workspace "$WORKSPACE" -scheme Pods-LynxFrameworkBuilder -showBuildSettings 2>/dev/null | grep -m1 BUILD_DIR | awk '{print $3}' | sed 's|/Build/Products||')
+DERIVED_DATA=$(xcodebuild -workspace "$XCODE_WORKSPACE" -scheme Pods-LynxFrameworkBuilder -showBuildSettings 2>/dev/null | grep -m1 BUILD_DIR | awk '{print $3}' | sed 's|/Build/Products||')
 
 # Create XCFrameworks
 echo "Creating XCFrameworks..."

@@ -2,9 +2,9 @@
 .DS_Store
 
 # CocoaPods
-workspace/Pods/
-workspace/Podfile.lock
-workspace/*.xcworkspace/
+builder/Pods/
+builder/Podfile.lock
+builder/*.xcbuilder/
 
 # Xcode
 DerivedData/
