@@ -1,0 +1,6 @@
+framework module DebugRouter {
+  umbrella header "DebugRouter-umbrella.h"
+
+  export *
+  module * { export * }
+}

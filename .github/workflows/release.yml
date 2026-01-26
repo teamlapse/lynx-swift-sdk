@@ -1,0 +1,70 @@
+name: Update Lynx XCFrameworks
+
+on:
+  workflow_dispatch:
+    inputs:
+      lynx_version:
+        description: 'Lynx pod version (e.g., 3.6.0)'
+        required: true
+        default: '3.6.0'
+      primjs_version:
+        description: 'PrimJS pod version (e.g., 3.6.1)'
+        required: true
+        default: '3.6.1'
+      lynx_service_version:
+        description: 'LynxService pod version (e.g., 3.6.0)'
+        required: true
+        default: '3.6.0'
+      xelement_version:
+        description: 'XElement pod version (e.g., 3.6.0)'
+        required: true
+        default: '3.6.0'
+      release_tag:
+        description: 'Release tag (e.g., 3.6.0)'
+        required: true
+
+jobs:
+  build:
+    runs-on: namespace-profile-marquis-ios
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install CocoaPods
+        run: gem install cocoapods
+
+      - name: Update Podfile versions
+        run: |
+          cd workspace
+          sed -i '' "s/pod 'Lynx', '[^']*'/pod 'Lynx', '${{ inputs.lynx_version }}'/" Podfile
+          sed -i '' "s/pod 'PrimJS', '[^']*'/pod 'PrimJS', '${{ inputs.primjs_version }}'/" Podfile
+          sed -i '' "s/pod 'LynxService', '[^']*'/pod 'LynxService', '${{ inputs.lynx_service_version }}'/" Podfile
+          sed -i '' "s/pod 'XElement', '[^']*'/pod 'XElement', '${{ inputs.xelement_version }}'/" Podfile
+          cat Podfile
+
+      - name: Build XCFrameworks
+        run: |
+          chmod +x build-xcframeworks.sh
+          # Force rebuild by removing stamp file
+          rm -f XCFrameworks/.build_stamp
+          ./build-xcframeworks.sh
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add workspace/Podfile
+          git add XCFrameworks/
+          git commit -m "Update Lynx to ${{ inputs.release_tag }}
+
+          Versions:
+          - Lynx: ${{ inputs.lynx_version }}
+          - PrimJS: ${{ inputs.primjs_version }}
+          - LynxService: ${{ inputs.lynx_service_version }}
+          - XElement: ${{ inputs.xelement_version }}"
+          git push
+
+      - name: Create release tag
+        run: |
+          git tag ${{ inputs.release_tag }}
+          git push origin ${{ inputs.release_tag }}

@@ -1,0 +1,6 @@
+framework module BaseDevtool {
+  umbrella header "BaseDevtool-umbrella.h"
+
+  export *
+  module * { export * }
+}

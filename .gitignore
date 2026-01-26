@@ -1,0 +1,14 @@
+# macOS
+.DS_Store
+
+# CocoaPods
+workspace/Pods/
+workspace/Podfile.lock
+workspace/*.xcworkspace/
+
+# Xcode
+DerivedData/
+*.xcuserstate
+
+# Build artifacts
+XCFrameworks/.build_stamp

@@ -1,0 +1,31 @@
+platform :ios, '13.0'
+
+# Disable input/output paths to avoid sandbox issues
+install! 'cocoapods', :disable_input_output_paths => true
+
+target 'LynxFrameworkBuilder' do
+  use_frameworks! :linkage => :dynamic
+
+  # Core Lynx Engine
+  pod 'Lynx', '3.6.0', :subspecs => ['Framework']
+  pod 'PrimJS', '3.6.1', :subspecs => ['quickjs', 'napi']
+
+  # Lynx Services
+  pod 'LynxService', '3.6.0', :subspecs => ['Log', 'Devtool']
+
+  # Extended Elements
+  pod 'XElement', '3.6.0'
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+      config.build_settings['BUILD_LIBRARY_FOR_DISTRIBUTION'] = 'YES'
+      config.build_settings['SKIP_INSTALL'] = 'NO'
+      # Disable treating deprecation warnings as errors (Lynx uses deprecated APIs)
+      config.build_settings['GCC_TREAT_WARNINGS_AS_ERRORS'] = 'NO'
+      config.build_settings['OTHER_CFLAGS'] = '$(inherited) -Wno-error=deprecated-declarations -Wno-error=deprecated-implementations'
+    end
+  end
+end
