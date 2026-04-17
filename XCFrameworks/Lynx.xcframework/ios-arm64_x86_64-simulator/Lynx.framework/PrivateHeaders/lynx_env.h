@@ -66,7 +66,6 @@ class LYNX_EXPORT_FOR_DEVTOOL LynxEnv {
     ENABLE_ASYNC_THREAD_CACHE,
     MULTI_TASM_THREAD_SIZE,
     MULTI_LAYOUT_THREAD_SIZE,
-    ENABLE_PRESET_THREAD_PRIORITY,
     ENABLE_FLUENCY_TRACE,
     GLOBAL_QUICK_CONTEXT_POOL_SIZE,
     ENABLE_REPORT_THREADED_ELEMENT_FLUSH_STATISTIC,
@@ -88,7 +87,6 @@ class LYNX_EXPORT_FOR_DEVTOOL LynxEnv {
     ASYNC_DESTROY_ENGINE_COUNT,
     CONCURRENT_LOOP_HIGH_PRIORITY_WORKER_COUNT_PERCENT,
     ENABLE_USE_CONTEXT_POOL,
-    ENABLE_FIBER_ELEMENT_FOR_RADON_DIFF,
     ENABLE_NATIVE_CREATE_VIEW_ASYNC,
     ENABLE_SIGNAL_API,
     ENABLE_FIXED_NEW,
@@ -102,25 +100,23 @@ class LYNX_EXPORT_FOR_DEVTOOL LynxEnv {
     ENABLE_BATCH_LAYOUT_TASK_WITH_SYNC_LAYOUT,
     ENABLE_JSVM_RUNTIME,
     ENABLE_UNIFIED_PIXEL_PIPELINE,
-    FIX_PARALLEL_Z_INDEX_CRASH,
-    FIX_INSERT_BEFORE_FIXED_BUG,
     ENABLE_REPORT_BTS_CONTEXT_EVENT,
     ENABLE_FIBER_ELEMENT_MEMORY_REPORT,
-    FIX_FONT_SIZE_OVERRIDE_DIRECTION_CHANGE_BUG,
     ENABLE_HARMONY_NEW_OVERLAY,
-    // FIXME(linxs): remove this config in the next version(remove in 3.5)
-    FIX_NEGATIVE_Z_INDEX_INSERT_BUG,
-    // FIXME(linxs): remove this config int the next version
-    FIX_FIXED_Z_INDEX_SWITCH_BUG,
     // FIXME(linxs): remove this config in the next version(remove in 3.6)
-    FIX_STACKING_CONTEXT_FLAG_BUG,
     FIX_NEW_ANIMATOR_FLUSH_BUG,
     ENABLE_NEW_ANIMATOR_ON_PATCH_FINISH_OPT,
     ENABLE_EVENT_HANDLE_REFACTOR,
+    // FIXME(dingwang.wxx): remove this config in the next version(remove
+    // in 3.8)
     ENABLE_DECOUPLED_LIST,
     // FIXME(wangyifei.20010605): remove this config in the next version(remove
     // in 3.6)
     FIX_RADON_TRANSITION_PROPERTY_REMOVE_BUG,
+    // FIXME(linxs): remove this config in the next version(remove in 3.8)
+    FIX_LIST_CALLBACK_LEAK_BUG,
+    // FIXME(zhouzhitao): remove this config in the next version(remove in 3.9)
+    FIX_NEW_FIXED_REMOVAL_BUG,
     ENABLE_GLOBAL_FONT_COLLECTION,
     ENABLE_GC_ONCE_ON_IDLE,
     ENABLE_CSS_INLINE_VARIABLES,
@@ -130,7 +126,17 @@ class LYNX_EXPORT_FOR_DEVTOOL LynxEnv {
     ENABLE_QUICKJS_THREAD_CHECKER,
     ENABLE_LEVEL_ORDER_TRAVERSING,
     LYNX_DEBUG_ENABLED,
-    ENABLE_JS_CALLBACK_MANAGER,
+    ENABLE_HARMONY_DRAW_BEHIND,
+    ENABLE_HARMONY_NEW_IMAGE,
+    ENABLE_UNIFY_FIXED_BEHAVIOR,
+    // FIXME(dingwang.wxx): remove this config in the next version(remove
+    // in 3.8)
+    DISABLE_LIST_CALLBACK_IF_DETACHED,
+    ENABLE_SHARE_CONTEXT_ICU,
+    FIX_RADON_INLINE_CONVERT_BUG,
+    FIX_DYNAMIC_UPDATE_TRANSITION_CONSUME_BUG,
+    ENABLE_LIST_NEW_ARCHITECTURE,
+    ENABLE_FETCH_API_STANDARD_STREAMING,
     // Please add new enum values above
     END_MARK,  // Keep this as the last enum value, and do not use
   };
@@ -195,8 +201,6 @@ class LYNX_EXPORT_FOR_DEVTOOL LynxEnv {
             {Key::ENABLE_ASYNC_THREAD_CACHE, "enable_async_thread_cache"},
             {Key::MULTI_TASM_THREAD_SIZE, "multi_tasm_thread_size"},
             {Key::MULTI_LAYOUT_THREAD_SIZE, "multi_layout_thread_size"},
-            {Key::ENABLE_PRESET_THREAD_PRIORITY,
-             "enable_preset_thread_priority"},
             {Key::ENABLE_FLUENCY_TRACE, "ENABLE_FLUENCY_TRACE"},
             {Key::ENABLE_REPORT_THREADED_ELEMENT_FLUSH_STATISTIC,
              "enable_report_threaded_element_flush_statistic"},
@@ -225,8 +229,6 @@ class LYNX_EXPORT_FOR_DEVTOOL LynxEnv {
             {Key::CONCURRENT_LOOP_HIGH_PRIORITY_WORKER_COUNT_PERCENT,
              "concurrent_loop_high_priority_worker_count_percent"},
             {Key::ENABLE_USE_CONTEXT_POOL, "enable_use_context_pool"},
-            {Key::ENABLE_FIBER_ELEMENT_FOR_RADON_DIFF,
-             "enable_fiber_element_for_radon_diff"},
             {Key::ENABLE_NATIVE_CREATE_VIEW_ASYNC,
              "enable_native_create_view_async"},
             {Key::ENABLE_SIGNAL_API, "enable_signal_api"},
@@ -245,24 +247,18 @@ class LYNX_EXPORT_FOR_DEVTOOL LynxEnv {
             {Key::ENABLE_JSVM_RUNTIME, kLyneEnableJSVMRuntime},
             {Key::ENABLE_UNIFIED_PIXEL_PIPELINE,
              "enable_unified_pixel_pipeline"},
-            {Key::FIX_PARALLEL_Z_INDEX_CRASH, "fix_parallel_z_index_crash"},
-            {Key::FIX_INSERT_BEFORE_FIXED_BUG, "fix_insert_before_fixed_bug"},
             {Key::ENABLE_REPORT_BTS_CONTEXT_EVENT,
              "enable_report_mts_context_event"},
             {Key::ENABLE_FIBER_ELEMENT_MEMORY_REPORT,
              "enable_fiber_element_memory_report"},
-            {Key::FIX_FONT_SIZE_OVERRIDE_DIRECTION_CHANGE_BUG,
-             "fix_font_size_override_direction_change_bug"},
             {Key::ENABLE_HARMONY_NEW_OVERLAY, "enable_harmony_new_overlay"},
-            {Key::FIX_NEGATIVE_Z_INDEX_INSERT_BUG, "fix_negative_z_index_bug"},
-            {Key::FIX_FIXED_Z_INDEX_SWITCH_BUG, "fix_fixed_z_index_switch_bug"},
-            {Key::FIX_STACKING_CONTEXT_FLAG_BUG,
-             "fix_stacking_context_flag_bug"},
             {Key::FIX_NEW_ANIMATOR_FLUSH_BUG, "fix_new_animator_flush_bug"},
             {Key::ENABLE_NEW_ANIMATOR_ON_PATCH_FINISH_OPT,
              "enable_new_animator_on_patch_finish_opt"},
             {Key::ENABLE_EVENT_HANDLE_REFACTOR, "enable_event_refactor"},
             {Key::ENABLE_DECOUPLED_LIST, "enable_decoupled_list"},
+            {Key::DISABLE_LIST_CALLBACK_IF_DETACHED,
+             "disable_list_callback_if_detached"},
             {Key::FIX_RADON_TRANSITION_PROPERTY_REMOVE_BUG,
              "fix_radon_transition_property_remove_bug"},
             {Key::ENABLE_GLOBAL_FONT_COLLECTION,
@@ -276,7 +272,18 @@ class LYNX_EXPORT_FOR_DEVTOOL LynxEnv {
              "enable_quickjs_thread_checker"},
             {Key::ENABLE_LEVEL_ORDER_TRAVERSING,
              "enable_level_order_traversing"},
-            {Key::ENABLE_JS_CALLBACK_MANAGER, "enable_js_callback_manager"},
+            {Key::ENABLE_HARMONY_DRAW_BEHIND, "enable_harmony_draw_behind"},
+            {Key::ENABLE_HARMONY_NEW_IMAGE, "enable_harmony_new_image"},
+            {Key::ENABLE_UNIFY_FIXED_BEHAVIOR, "enable_unify_fixed_behavior"},
+            {Key::ENABLE_SHARE_CONTEXT_ICU, "enable_share_context_icu"},
+            {Key::FIX_RADON_INLINE_CONVERT_BUG, "fix_radon_inline_convert_bug"},
+            {Key::FIX_DYNAMIC_UPDATE_TRANSITION_CONSUME_BUG,
+             "fix_dynamic_update_transition_consume_bug"},
+            {Key::FIX_LIST_CALLBACK_LEAK_BUG, "fix_list_callback_leak"},
+            {Key::ENABLE_LIST_NEW_ARCHITECTURE, "enable_list_new_architecture"},
+            {Key::ENABLE_FETCH_API_STANDARD_STREAMING,
+             "enable_fetch_api_standard_streaming"},
+            {Key::FIX_NEW_FIXED_REMOVAL_BUG, "fix_new_fixed_removal_bug"},
         });
     auto it = (*env_key_to_string_map).find(key);
     DCHECK(it != (*env_key_to_string_map).end());
@@ -370,7 +377,6 @@ class LYNX_EXPORT_FOR_DEVTOOL LynxEnv {
   bool GetVsyncAlignedFlushGlobalSwitch();
   bool EnableGlobalFeatureSwitchStatistic();
   bool EnableFeatureCounter();
-  bool EnablePresetThreadPriority();
   bool EnableJSBTiming();
   bool EnableAsyncJSBTiming();
   bool EnableLongTaskTiming();
@@ -408,15 +414,13 @@ class LYNX_EXPORT_FOR_DEVTOOL LynxEnv {
   bool EnableBatchLayoutTaskWithSyncLayout();
   bool EnableJSVMRuntime();
   bool EnableUnifiedPixelPipeline();
-  bool FixParallelZIndexCrash();
-  bool FixInsertBeforeFixedBug();
   bool EnableReportMTSContextEvent();
   bool EnableFiberElementMemoryReport();
-  bool FixFontSizeOverrideDirectionChangeBug();
   bool EnableHarmonyNewOverlay();
   bool EnableNewAnimatorOnPatchFinishOpt();
   bool EnableEventHandleRefactor();
   bool EnableDecoupledList();
+  bool DisableListCallbackIfDetached();
   bool FixRadonTransitionPropertyRemoveBug();
   bool EnableGlobalFontCollection();
   uint32_t EnableGCOnceOnIdle();
@@ -424,8 +428,16 @@ class LYNX_EXPORT_FOR_DEVTOOL LynxEnv {
   bool EnableOptimizeHasOpacity();
   bool DisableJSModeStrip();
   bool EnablePlatformDataFix();
+  bool EnableListNewArchitecture();
   bool EnableQuickJsThreadChecker();
   bool EnableLevelOrderTraversing();
+  bool EnableHarmonyDrawBehind();
+  bool EnableHarmonyNewImage();
+  bool EnableUnifyFixedBehavior();
+  bool FixRadonInlineConvertBug();
+  bool FixDynamicUpdateTransitionConsumeBug();
+  bool EnableFetchAPIStreamingStandard();
+  bool FixNewFixedRemovalBug();
 
   LynxEnv(const LynxEnv&) = delete;
   LynxEnv& operator=(const LynxEnv&) = delete;

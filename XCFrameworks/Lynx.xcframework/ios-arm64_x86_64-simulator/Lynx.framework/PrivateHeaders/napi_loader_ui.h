@@ -2,13 +2,13 @@
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
 
-#ifndef CORE_RUNTIME_BINDINGS_NAPI_WORKLET_NAPI_LOADER_UI_H_
-#define CORE_RUNTIME_BINDINGS_NAPI_WORKLET_NAPI_LOADER_UI_H_
+#ifndef CORE_RUNTIME_LEPUSNG_NAPI_WORKLET_NAPI_LOADER_UI_H_
+#define CORE_RUNTIME_LEPUSNG_NAPI_WORKLET_NAPI_LOADER_UI_H_
 
 #include <unordered_map>
 
-#include "core/runtime/bindings/napi/napi_environment.h"
-#include "core/runtime/vm/lepus/quick_context.h"
+#include "core/runtime/common/napi/napi_environment.h"
+#include "core/runtime/lepusng/quick_context.h"
 #include "third_party/binding/napi/shim/shim_napi.h"
 
 #ifdef USE_PRIMJS_NAPI
@@ -47,4 +47,4 @@ class NapiLoaderUI : public piper::NapiEnvironment::Delegate {
 #include "third_party/napi/include/primjs_napi_undefs.h"
 #endif
 
-#endif  // CORE_RUNTIME_BINDINGS_NAPI_WORKLET_NAPI_LOADER_UI_H_
+#endif  // CORE_RUNTIME_LEPUSNG_NAPI_WORKLET_NAPI_LOADER_UI_H_

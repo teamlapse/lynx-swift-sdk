@@ -22,11 +22,13 @@ namespace tasm {
 class ElementContainer : public BaseElementContainer {
  public:
   explicit ElementContainer(Element* element);
-  virtual ~ElementContainer();
+  ~ElementContainer() override;
 
   ElementContainer* element_container_parent() {
     return static_cast<ElementContainer*>(parent());
   }
+
+  bool HasUIPrimitive() const override;
 
   const auto& children() const { return children_; }
 
@@ -55,6 +57,13 @@ class ElementContainer : public BaseElementContainer {
   void UpdatePaintingNode(
       bool tend_to_flatten,
       const fml::RefPtr<PropBundle>& painting_data) override;
+
+  void InsertListItemPaintingNode(int32_t child_id) override;
+  void RemoveListItemPaintingNode(int32_t child_id) override;
+  void UpdateContentOffsetForListContainer(float content_size, float delta_x,
+                                           float delta_y,
+                                           bool is_init_scroll_offset,
+                                           bool from_layout) override;
 
  protected:
   void ReInsertChildForLayoutOnlyTransition(Element* child, int& index);
@@ -106,6 +115,11 @@ class ElementContainer : public BaseElementContainer {
   bool is_layouted_{false};
   // true if the Element's props has changed during this patch
   bool props_changed_{true};
+
+ private:
+  void CalcUIIndexForFixed(ElementContainer* child, int& index);
+  void CalcUIIndexForFixedNew(ElementContainer* child, int& index);
+  void CalcUIIndexForFixedUnified(ElementContainer* child, int& index);
 };
 
 }  // namespace tasm

@@ -3,10 +3,15 @@
 // LICENSE file in the root directory of this source tree.
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface LynxPerformanceEntry : NSObject
 @property(nonatomic, strong) NSString* name;
 @property(nonatomic, strong) NSString* entryType;
+@property(nonatomic, assign) BOOL typeResolved;
 @property(nonatomic, strong) NSDictionary* rawDictionary;
 - (instancetype)initWithDictionary:(NSDictionary*)dictionary;
 - (NSDictionary*)toDictionary;
 @end
+
+NS_ASSUME_NONNULL_END

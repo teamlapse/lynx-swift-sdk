@@ -31,19 +31,21 @@
 #include "core/public/prop_bundle.h"
 #include "core/renderer/css/computed_css_style.h"
 #include "core/renderer/css/css_variable_handler.h"
+#include "core/renderer/css/shared_css_fragment.h"
 #include "core/renderer/dom/element.h"
 #include "core/renderer/dom/element_container.h"
 #include "core/renderer/dom/element_context_delegate.h"
 #include "core/renderer/dom/element_context_task_queue.h"
 #include "core/renderer/dom/element_vsync_proxy.h"
 #include "core/renderer/dom/fiber/page_element.h"
-#include "core/renderer/dom/vdom/radon/radon_element.h"
 #include "core/renderer/dom/vdom/radon/radon_types.h"
+#include "core/renderer/layout_scheduler/layout_scheduler.h"
 #include "core/renderer/pipeline/pipeline_layout_data.h"
 #include "core/renderer/ui_wrapper/common/prop_bundle_creator_default.h"
 #include "core/renderer/ui_wrapper/layout/layout_context.h"
 #include "core/renderer/ui_wrapper/painting/painting_context.h"
 #include "core/renderer/utils/base/tasm_worker_task_runner.h"
+#include "core/runtime/lepus/bindings/style/shared_css_fragment_wrapper.h"
 #include "core/services/event_report/event_tracker.h"
 #include "core/services/timing_handler/timing_handler.h"
 #include "core/template_bundle/template_codec/binary_decoder/page_config.h"
@@ -176,15 +178,14 @@ class ComponentManager {
   std::unordered_map<std::string, Element *> component_map_;
 };
 
-class ElementManager : public ElementContextDelegate {
+class ElementManager : public ElementContextDelegate,
+                       public LayoutScheduler::LayoutSchedulerImpl {
  public:
   class Delegate {
    public:
     Delegate() = default;
     virtual ~Delegate() = default;
 
-    virtual void DispatchLayoutUpdates(
-        const std::shared_ptr<PipelineOptions> &options) = 0;
     virtual std::unordered_map<int32_t, LayoutInfoArray> GetSubTreeLayoutInfo(
         int32_t root_id, Viewport viewport = Viewport{}) = 0;
 
@@ -197,7 +198,6 @@ class ElementManager : public ElementContextDelegate {
                                   int index) = 0;
     virtual void SendAnimationEvent(const std::string &type, int tag,
                                     const lepus::Value &dict) = 0;
-    virtual void RemoveLayoutNodeAtIndex(int32_t parent_id, int index) = 0;
     virtual void SendNativeCustomEvent(const std::string &name, int tag,
                                        const lepus::Value &param_value,
                                        const std::string &param_name) = 0;
@@ -254,15 +254,19 @@ class ElementManager : public ElementContextDelegate {
   // std::unique_ptr object
   virtual ~ElementManager();
 
-  virtual fml::RefPtr<RadonElement> CreateNode(
-      const base::String &tag, const fml::RefPtr<AttributeHolder> &node,
-      uint32_t node_index = 0,
-      RadonNodeType radon_node_type = RadonNodeType::kRadonUnknown);
-
   LYNX_EXPORT_FOR_DEVTOOL void OnFinishUpdateProps(
       Element *node, std::shared_ptr<PipelineOptions> &options);
 
   void PatchEventRelatedInfo();
+  void MarkNeedReconstructEventTargetTreeForExposure() {
+    need_reconstruct_event_target_tree_for_exposure_ = true;
+  }
+  bool NeedReconstructEventTargetTreeForExposure() const {
+    return need_reconstruct_event_target_tree_for_exposure_;
+  }
+  void ResetNeedReconstructEventTargetTreeForExposure() {
+    need_reconstruct_event_target_tree_for_exposure_ = false;
+  }
 
   bool GetDevToolFlag() { return devtool_flag_; }
 
@@ -289,9 +293,6 @@ class ElementManager : public ElementContextDelegate {
   void RecordComponent(const std::string &id, Element *node);
   void EraseComponentRecord(const std::string &id, Element *node);
   Element *GetComponent(const std::string &id);
-
-  void ResolveAttributesAndStyle(AttributeHolder *node, Element *shadow_node,
-                                 const StyleMap &styles);
 
   void ResolveEvents(AttributeHolder *node, Element *element);
 
@@ -320,7 +321,6 @@ class ElementManager : public ElementContextDelegate {
   void UpdateLayoutNodeFontSize(int32_t id, double cur_node_font_size,
                                 double root_node_font_size);
   void InsertLayoutNode(int32_t parent_id, int32_t child_id, int index);
-  void RemoveLayoutNodeAtIndex(int32_t parent_id, int index);
   void InsertLayoutNodeBefore(int32_t parent_id, int32_t child_id,
                               int32_t ref_id);
   void RemoveLayoutNode(int32_t parent_id, int32_t child_id);
@@ -361,6 +361,7 @@ class ElementManager : public ElementContextDelegate {
                            float height, int height_mode);
   void DispatchLayoutBefore(Element *element);
   void AlignText(Element *element);
+  void DestroyText(Element *element);
 
   void MarkLayoutDirty(int32_t id);
   void AttachLayoutNodeType(int32_t id, const base::String &tag,
@@ -438,6 +439,18 @@ class ElementManager : public ElementContextDelegate {
     return *kDefaultCSSConfigs;
   }
 
+  // Adopted stylesheets management for runtime CSS adoption
+  void AdoptStyleSheet(fml::RefPtr<tasm::SharedCSSFragmentWrapper> wrapper) {
+    adopted_stylesheets_.push_back(std::move(wrapper));
+  }
+
+  void ClearAdoptedStyleSheets() { adopted_stylesheets_.clear(); }
+
+  const std::vector<fml::RefPtr<tasm::SharedCSSFragmentWrapper>> &
+  GetAdoptedStyleSheets() const {
+    return adopted_stylesheets_;
+  }
+
   bool GetEnableLayoutOnly() {
     if (config_) {
       return config_->GetEnableNewLayoutOnly() && enable_layout_only_;
@@ -492,6 +505,11 @@ class ElementManager : public ElementContextDelegate {
   }
 
   bool GetEnableNewAnimatorForFiber() {
+    // If enable fragment layer render, default enable new animation.
+    // TODO(songshourui.null): support simple styling + new animation.
+    if (IsFragmentLayerRenderModeOn()) {
+      return true;
+    }
     if (config_) {
       return config_->GetEnableNewAnimator() && !enable_simple_style_;
     }
@@ -567,10 +585,6 @@ class ElementManager : public ElementContextDelegate {
       return config_->GetEnableNewGesture();
     }
     return false;
-  }
-
-  bool UseFiberElement() {
-    return GetEnableFiberArch() || GetEnableFiberElementForRadonDiff();
   }
 
   bool GetEnableFiberArch() {
@@ -720,6 +734,10 @@ class ElementManager : public ElementContextDelegate {
 
   bool GetEnableFixedNew() const {
     return config_ && config_->GetEnableFixedNew();
+  }
+
+  bool GetEnableUnifyFixedBehavior() {
+    return config_ && config_->GetEnableUnifyFixedBehavior();
   }
 
   bool GetEnableReloadLifecycle() const {
@@ -930,6 +948,12 @@ class ElementManager : public ElementContextDelegate {
    * Generate ID for element
    */
   int32_t GenerateElementID();
+
+  /**
+   * Generate global insertion order for element
+   */
+  uint32_t GenerateGlobalInsertionOrder();
+
   /**
    * Reuse ID for element when hydrate element bundle
    */
@@ -969,12 +993,6 @@ class ElementManager : public ElementContextDelegate {
   void SetEnableReportThreadedElementFlushStatistic(bool value) {
     enable_report_threaded_element_flush_statistic_ = value;
   }
-
-  bool GetEnableFiberElementForRadonDiff() {
-    return enable_fiber_element_for_radon_diff_;
-  }
-
-  void SetEnableFiberElementForRadonDiff(TernaryBool value);
 
   bool GetEnableOptPushStyleToBundle() {
     return enable_opt_push_style_to_bundle_;
@@ -1083,35 +1101,35 @@ class ElementManager : public ElementContextDelegate {
   void LegacyHandleLayoutTask(FiberElement *target,
                               base::MoveOnlyClosure<void> operation);
 
+  void SetLayoutTick(
+      base::MoveOnlyClosure<void, const std::shared_ptr<PipelineOptions>>
+          tick) {
+    layout_tick_ = std::move(tick);
+  }
+
   /**
    * call this function to request layout
    * @param options the pipeline options passed to layout context
    */
-  void RequestLayout(const std::shared_ptr<PipelineOptions> &options);
+  void RequestLayout(const std::shared_ptr<PipelineOptions> &options) override;
 
   void MarkLayoutDirtyAndRequestLayout(
       int32_t id, const std::shared_ptr<PipelineOptions> &options);
 
   inline bool GetEnableBatchLayoutTaskWithSyncLayout() {
-    return enable_batch_layout_task_with_sync_layout_;
+    return config_ ? config_->GetEnableBatchLayoutTaskWithSyncLayout() : false;
   }
 
-  bool FixZIndexCrash() { return fix_parallel_z_index_crash_; }
-
-  bool FixInsertBeforeFixedBug() { return fix_insert_before_fixed_bug_; }
-
-  bool FixFontSizeOverrideDirectionChangeBug() {
-    return fix_font_size_override_direction_change_bug_;
-  }
-
-  bool FixNegativeZIndexBug() { return fix_negative_z_index_bug_; }
-
-  bool FixFixedZIndexSwitchBug() const { return fix_fixed_z_index_switch_bug_; }
-
-  bool FixStackingContextDirtyFlagBug() const {
-    return fix_stacking_context_dirty_flag_;
-  }
   bool FixNewAnimatorFlushBug() const { return fix_new_animator_flush_bug_; }
+  bool FixRadonInlineConvertBug() const {
+    return fix_radon_inline_convert_bug_;
+  }
+  bool FixDynamicUpdateTransitionConsumeBug() const {
+    return fix_dynamic_update_transition_consume_bug_;
+  }
+
+  bool FixListCallbackLeakFlag() const { return fix_list_callback_leak_flag_; }
+  bool FixNewFixedRemovalBug() const { return fix_new_fixed_removal_bug_; }
 
   bool CSSFragmentParsingOnTASMWorkerMTSRender();
 
@@ -1143,6 +1161,10 @@ class ElementManager : public ElementContextDelegate {
     return enable_level_order_traversing_;
   }
 
+  bool DisableListCallbackIfDetached() const {
+    return disable_list_callback_if_detached_;
+  }
+
   void RegisterVMUpdateOuterObjSizeCallback(
       base::MoveOnlyClosure<void, int> closure);
 
@@ -1161,12 +1183,14 @@ class ElementManager : public ElementContextDelegate {
 
   bool IsEmbeddedModeOn() const { return page_options_.IsEmbeddedModeOn(); }
 
-  inline bool IsLayoutInElementModeOn() const {
-    return enable_layout_in_element_mode_;
+  bool IsLayoutInElementModeOn() const {
+    return page_options_.IsLayoutInElementModeOn();
   }
 
+  bool IsUsingTextService() const { return page_options_.IsUsingTextService(); }
+
   bool IsFragmentLayerRenderModeOn() const {
-    return enable_fragment_layer_render_;
+    return page_options_.IsFragmentLayerRender();
   }
 
   LayoutCtxPlatformImpl *layout_context() {
@@ -1195,6 +1219,10 @@ class ElementManager : public ElementContextDelegate {
   }
 
  protected:
+  void TickLayout(const std::shared_ptr<PipelineOptions> &options);
+
+  void TickListIfNeeded(const std::shared_ptr<PipelineOptions> &options);
+
   /**
    * call this function after exec OnPatchFinishForFiber
    */
@@ -1212,11 +1240,6 @@ class ElementManager : public ElementContextDelegate {
   std::shared_ptr<InspectorElementObserver> inspector_element_observer_;
 
  private:
-  // Do not call this function directly; it needs to be called from
-  // OnPatchFinish.
-  void OnPatchFinishForRadon(
-      std::shared_ptr<PipelineOptions> &option,
-      base::MoveOnlyClosure<void, bool> patch_finish_callback);
   /**
    * a special onPatchFinish function for fiber
    * @param option options for onPatchFinish
@@ -1232,10 +1255,10 @@ class ElementManager : public ElementContextDelegate {
   ElementManager(const ElementManager &) = delete;
   ElementManager &operator=(const ElementManager &) = delete;
   void OnListComponentUpdated(const std::shared_ptr<PipelineOptions> &options);
-  void DispatchLayoutUpdates(const std::shared_ptr<PipelineOptions> &options);
 
   const int instance_id_;
   int32_t element_id_{kInitialImplId};
+  uint32_t next_global_insertion_order_{kInitialGlobalInsertionOrder};
 
   // Current thread strategy
   int thread_strategy_;
@@ -1273,8 +1296,6 @@ class ElementManager : public ElementContextDelegate {
 
   bool enable_report_threaded_element_flush_statistic_{false};
 
-  bool enable_fiber_element_for_radon_diff_{false};
-
   bool settings_enable_use_mapbuffer_for_ui_op_;
 
   bool enable_opt_push_style_to_bundle_{false};
@@ -1293,14 +1314,10 @@ class ElementManager : public ElementContextDelegate {
 
   bool enable_layout_only_{true};
   bool dom_tree_enabled_{true};
-  bool enable_batch_layout_task_with_sync_layout_{false};
-  bool fix_parallel_z_index_crash_{true};
-  bool fix_insert_before_fixed_bug_{true};
-  bool fix_font_size_override_direction_change_bug_{true};
-  bool fix_negative_z_index_bug_{true};
-  bool fix_fixed_z_index_switch_bug_{true};
-  bool fix_stacking_context_dirty_flag_{true};
   bool fix_new_animator_flush_bug_{true};
+  bool fix_radon_inline_convert_bug_{true};
+  bool fix_dynamic_update_transition_consume_bug_{true};
+  bool fix_new_fixed_removal_bug_{true};
   bool css_fragment_parsing_tasm_worker_thread_{false};
   bool enable_level_order_traversing_{false};
   std::atomic_int pending_level_order_tasks_{0};
@@ -1308,14 +1325,17 @@ class ElementManager : public ElementContextDelegate {
   bool require_css_variables_{false};
 
   bool enable_fiber_element_memory_reporter_{false};
-  bool enable_layout_in_element_mode_{false};
-  bool enable_fragment_layer_render_{false};
   bool enable_property_based_simple_style_{false};
+
+  bool fix_list_callback_leak_flag_{true};
 
   bool has_viewport_ready_{false};
   bool is_memory_collecting_{false};
 
   bool enable_simple_style_{false};
+
+  bool disable_list_callback_if_detached_{false};
+  bool need_reconstruct_event_target_tree_for_exposure_{false};
 
   LynxEnvConfig lynx_env_config_;
   std::shared_ptr<PageConfig> config_;
@@ -1370,6 +1390,9 @@ class ElementManager : public ElementContextDelegate {
 
   std::shared_ptr<CSSKeyframesTokenMap> key_frames_;
 
+  // Adopted stylesheets for runtime CSS adoption with highest cascade priority
+  std::vector<fml::RefPtr<tasm::SharedCSSFragmentWrapper>> adopted_stylesheets_;
+
   base::MoveOnlyClosure<void, int> vm_update_outer_obj_size_callback_{};
 
   ALLOW_UNUSED_TYPE int64_t record_id_{0};
@@ -1378,6 +1401,13 @@ class ElementManager : public ElementContextDelegate {
       devtool_func_map_;
 
   base::MoveOnlyClosure<void> request_layout_callback_;
+
+  // Keep layout_tick_ for now. Once enable_unified_pipeline is fully rolled
+  // out, layout triggering will be driven by TemplateAssembler. ElementManager
+  // will only implement layout when LayoutInElement is enabled and will no
+  // longer proactively tick layout, so this variable can be removed.
+  base::MoveOnlyClosure<void, const std::shared_ptr<PipelineOptions>>
+      layout_tick_;
 
  public:
   // fixed node attached to the page node.

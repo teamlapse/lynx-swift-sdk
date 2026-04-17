@@ -1,14 +1,14 @@
 // Copyright 2023 The Lynx Authors. All rights reserved.
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
-#ifndef CORE_RUNTIME_JSI_JSC_JSC_CONTEXT_GROUP_WRAPPER_H_
-#define CORE_RUNTIME_JSI_JSC_JSC_CONTEXT_GROUP_WRAPPER_H_
+#ifndef CORE_RUNTIME_JS_JSI_JSC_JSC_CONTEXT_GROUP_WRAPPER_H_
+#define CORE_RUNTIME_JS_JSI_JSC_JSC_CONTEXT_GROUP_WRAPPER_H_
 
 #include <JavaScriptCore/JavaScript.h>
 
 #include <unordered_map>
 
-#include "core/runtime/jsi/jsi.h"
+#include "core/runtime/js/jsi/jsi.h"
 
 namespace lynx {
 namespace piper {
@@ -28,4 +28,4 @@ class JSCContextGroupWrapper : public VMInstance {
 
 }  // namespace piper
 }  // namespace lynx
-#endif  // CORE_RUNTIME_JSI_JSC_JSC_CONTEXT_GROUP_WRAPPER_H_
+#endif  // CORE_RUNTIME_JS_JSI_JSC_JSC_CONTEXT_GROUP_WRAPPER_H_

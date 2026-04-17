@@ -1,8 +1,8 @@
 // Copyright 2023 The Lynx Authors. All rights reserved.
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
-#ifndef CORE_RUNTIME_JSI_QUICKJS_QUICKJS_RUNTIME_H_
-#define CORE_RUNTIME_JSI_QUICKJS_QUICKJS_RUNTIME_H_
+#ifndef CORE_RUNTIME_JS_JSI_QUICKJS_QUICKJS_RUNTIME_H_
+#define CORE_RUNTIME_JS_JSI_QUICKJS_QUICKJS_RUNTIME_H_
 
 #include <memory>
 #include <set>
@@ -13,15 +13,15 @@
 #include "core/base/lynx_export.h"
 #include "core/base/observer/observer.h"
 #include "core/base/observer/observer_list.h"
-#include "core/runtime/jscache/js_cache_tracker.h"
-#include "core/runtime/jsi/jsi.h"
-#include "core/runtime/jsi/jslib.h"
-#include "core/runtime/jsi/quickjs/quickjs_context_wrapper.h"
-#include "core/runtime/jsi/quickjs/quickjs_helper.h"
-#include "core/runtime/jsi/quickjs/quickjs_host_function.h"
-#include "core/runtime/jsi/quickjs/quickjs_host_object.h"
-#include "core/runtime/jsi/quickjs/quickjs_inspector_manager.h"
-#include "core/runtime/jsi/quickjs/quickjs_runtime_wrapper.h"
+#include "core/runtime/js/bytecode/js_cache_tracker.h"
+#include "core/runtime/js/jsi/jsi.h"
+#include "core/runtime/js/jsi/jslib.h"
+#include "core/runtime/js/jsi/quickjs/quickjs_context_wrapper.h"
+#include "core/runtime/js/jsi/quickjs/quickjs_helper.h"
+#include "core/runtime/js/jsi/quickjs/quickjs_host_function.h"
+#include "core/runtime/js/jsi/quickjs/quickjs_host_object.h"
+#include "core/runtime/js/jsi/quickjs/quickjs_inspector_manager.h"
+#include "core/runtime/js/jsi/quickjs/quickjs_runtime_wrapper.h"
 
 namespace lynx {
 namespace piper {
@@ -240,4 +240,4 @@ class QuickjsRuntime : public Runtime, public JSIObserver {
 // }
 // #endif
 
-#endif  // CORE_RUNTIME_JSI_QUICKJS_QUICKJS_RUNTIME_H_
+#endif  // CORE_RUNTIME_JS_JSI_QUICKJS_QUICKJS_RUNTIME_H_

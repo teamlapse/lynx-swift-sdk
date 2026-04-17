@@ -1,8 +1,8 @@
 // Copyright 2020 The Lynx Authors. All rights reserved.
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
-#ifndef CORE_RUNTIME_BINDINGS_LEPUS_RENDERER_FUNCTIONS_DEF_H_
-#define CORE_RUNTIME_BINDINGS_LEPUS_RENDERER_FUNCTIONS_DEF_H_
+#ifndef CORE_RUNTIME_LEPUS_BINDINGS_RENDERER_FUNCTIONS_DEF_H_
+#define CORE_RUNTIME_LEPUS_BINDINGS_RENDERER_FUNCTIONS_DEF_H_
 
 #define NORMAL_RENDERER_FUNCTIONS(V)  \
   V(GetTextInfo)                      \
@@ -221,5 +221,8 @@
   V(FetchBundle)                      \
   V(GetModule)                        \
   V(InvokeModuleMethod)               \
-  V(FiberGetComputedStyleByKey)
-#endif  // CORE_RUNTIME_BINDINGS_LEPUS_RENDERER_FUNCTIONS_DEF_H_
+  V(FiberGetComputedStyleByKey)       \
+  V(LoadStyleSheet)                   \
+  V(AdoptStyleSheet)                  \
+  V(ReplaceStyleSheets)
+#endif  // CORE_RUNTIME_LEPUS_BINDINGS_RENDERER_FUNCTIONS_DEF_H_

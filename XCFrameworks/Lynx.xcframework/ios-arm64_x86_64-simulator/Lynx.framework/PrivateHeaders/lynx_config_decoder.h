@@ -123,14 +123,6 @@ class LynxConfigDecoder final {
               : TernaryBool::FALSE_VALUE);
     }
 
-    if (doc.HasMember(config::kEnableFiberElementForRadonDiff) &&
-        doc[config::kEnableFiberElementForRadonDiff].IsBool()) {
-      page_config->SetEnableFiberElementForRadonDiff(
-          doc[config::kEnableFiberElementForRadonDiff].GetBool()
-              ? TernaryBool::TRUE_VALUE
-              : TernaryBool::FALSE_VALUE);
-    }
-
     if (doc.HasMember(config::kEnableOptPushStyleToBundle) &&
         doc[config::kEnableOptPushStyleToBundle].IsBool()) {
       page_config->SetEnableOptPushStyleToBundle(
@@ -352,6 +344,9 @@ class LynxConfigDecoder final {
         doc[config::kEnableListNewArchitecture].IsBool()) {
       page_config->SetListNewArchitecture(
           doc[config::kEnableListNewArchitecture].GetBool());
+    } else {
+      page_config->SetListNewArchitecture(
+          LynxEnv::GetInstance().EnableListNewArchitecture());
     }
 
     if (doc.HasMember(config::kEnableNewListContainer) &&
@@ -733,12 +728,6 @@ class LynxConfigDecoder final {
           doc[config::kCSSAlignWithLegacyW3C].GetBool());
     }
 
-    if (doc.HasMember(config::kEnableCSSStrictMode) &&
-        doc[config::kEnableCSSStrictMode].IsBool()) {
-      page_config->SetEnableCSSStrictMode(
-          doc[config::kEnableCSSStrictMode].GetBool());
-    }
-
     if (doc.HasMember(config::kUnifyVWVHBehavior) &&
         doc[config::kUnifyVWVHBehavior].IsBool()) {
       page_config->SetUnifyVWVH(doc[config::kUnifyVWVHBehavior].GetBool());
@@ -815,10 +804,54 @@ class LynxConfigDecoder final {
           LynxEnv::GetInstance().EnableCSSInlineVariables());
     }
 
+    if (doc.HasMember(config::kEnableMTSPreExecute) &&
+        doc[config::kEnableMTSPreExecute].IsBool()) {
+      page_config->SetEnableMTSPreExecute(
+          doc[config::kEnableMTSPreExecute].GetBool());
+    }
+
     if (doc.HasMember(config::kEnablePropertyBasedSimpleStyle) &&
         doc[config::kEnablePropertyBasedSimpleStyle].IsBool()) {
       page_config->SetEnablePropertyBasedSimpleStyle(
           doc[config::kEnablePropertyBasedSimpleStyle].GetBool());
+    }
+
+    if (doc.HasMember(config::kEnableUnifyFixedBehavior) &&
+        doc[config::kEnableUnifyFixedBehavior].IsBool()) {
+      page_config->SetEnableUnifyFixedBehavior(
+          doc[config::kEnableUnifyFixedBehavior].GetBool());
+    } else {
+      page_config->SetEnableUnifyFixedBehavior(
+          LynxEnv::GetInstance().EnableUnifyFixedBehavior());
+    }
+
+    if (doc.HasMember(config::kEnableTransformedTouchPosition) &&
+        doc[config::kEnableTransformedTouchPosition].IsBool()) {
+      page_config->SetEnableTransformedTouchPosition(
+          doc[config::kEnableTransformedTouchPosition].GetBool());
+    }
+
+    if (doc.HasMember(config::kEnableBatchLayoutTaskWithSyncLayout) &&
+        doc[config::kEnableBatchLayoutTaskWithSyncLayout].IsBool()) {
+      page_config->SetEnableBatchLayoutTaskWithSyncLayout(
+          doc[config::kEnableBatchLayoutTaskWithSyncLayout].GetBool());
+    } else {
+      page_config->SetEnableBatchLayoutTaskWithSyncLayout(
+          LynxEnv::GetInstance().EnableBatchLayoutTaskWithSyncLayout());
+    }
+
+    if (doc.HasMember(config::kEnableiOSAnimationLayerForExposure) &&
+        doc[config::kEnableiOSAnimationLayerForExposure].IsBool()) {
+      page_config->SetEnableiOSAnimationLayerForExposure(
+          doc[config::kEnableiOSAnimationLayerForExposure].GetBool());
+    }
+
+    if (doc.HasMember(config::kEnableFetchAPIStandardStreaming) &&
+        doc[config::kEnableFetchAPIStandardStreaming].IsBool()) {
+      page_config->SetEnableFetchAPIStandardStreaming(
+          doc[config::kEnableFetchAPIStandardStreaming].GetBool()
+              ? TernaryBool::TRUE_VALUE
+              : TernaryBool::FALSE_VALUE);
     }
   };
 };

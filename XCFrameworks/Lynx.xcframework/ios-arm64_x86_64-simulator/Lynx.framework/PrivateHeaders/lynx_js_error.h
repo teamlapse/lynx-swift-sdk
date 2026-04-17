@@ -2,14 +2,14 @@
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
 
-#ifndef CORE_RUNTIME_BINDINGS_JSI_LYNX_JS_ERROR_H_
-#define CORE_RUNTIME_BINDINGS_JSI_LYNX_JS_ERROR_H_
+#ifndef CORE_RUNTIME_JS_BINDINGS_LYNX_JS_ERROR_H_
+#define CORE_RUNTIME_JS_BINDINGS_LYNX_JS_ERROR_H_
 
 #include <string>
 #include <utility>
 #include <vector>
 
-#include "core/runtime/jsi/jsi.h"
+#include "core/runtime/js/jsi/jsi.h"
 
 namespace lynx::piper {
 
@@ -53,4 +53,4 @@ class LynxError : public HostObject {
 
 }  // namespace lynx::piper
 
-#endif  // CORE_RUNTIME_BINDINGS_JSI_LYNX_JS_ERROR_H_
+#endif  // CORE_RUNTIME_JS_BINDINGS_LYNX_JS_ERROR_H_

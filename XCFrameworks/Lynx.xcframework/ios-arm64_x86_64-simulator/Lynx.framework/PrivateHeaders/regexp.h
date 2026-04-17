@@ -2,8 +2,8 @@
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
 
-#ifndef CORE_RUNTIME_VM_LEPUS_REGEXP_H_
-#define CORE_RUNTIME_VM_LEPUS_REGEXP_H_
+#ifndef CORE_RUNTIME_LEPUS_REGEXP_H_
+#define CORE_RUNTIME_LEPUS_REGEXP_H_
 
 #include "base/include/value/base_string.h"
 #include "base/include/value/ref_counted_class.h"
@@ -82,4 +82,4 @@ class RegExp : public lepus::RefCounted {
 }  // namespace lepus
 }  // namespace lynx
 
-#endif  // CORE_RUNTIME_VM_LEPUS_REGEXP_H_
+#endif  // CORE_RUNTIME_LEPUS_REGEXP_H_

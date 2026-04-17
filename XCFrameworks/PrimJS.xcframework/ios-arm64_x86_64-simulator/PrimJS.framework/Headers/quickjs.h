@@ -1445,6 +1445,8 @@ typedef struct LEPUSCFunctionListEntry {
 #define LEPUS_DEF_PROP_UNDEFINED 7
 #define LEPUS_DEF_OBJECT 8
 #define LEPUS_DEF_ALIAS 9
+#define LEPUS_DEF_PROP_ATOM 10
+#define LEPUS_DEF_PROP_BOOL 11
 
 #define LEPUS_CFUNC_DEF(name, length, func1)                                 \
   {                                                                          \
@@ -1522,6 +1524,16 @@ typedef struct LEPUSCFunctionListEntry {
           from,                                                              \
           base                                                               \
         }                                                                    \
+  }
+
+#define LEPUS_PROP_ATOM_DEF(name, val, prop_flags)               \
+  {                                                              \
+    name, prop_flags, LEPUS_DEF_PROP_ATOM, 0, .u = {.i32 = val } \
+  }
+
+#define LEPUS_PROP_BOOL_DEF(name, val, prop_flags)               \
+  {                                                              \
+    name, prop_flags, LEPUS_DEF_PROP_BOOL, 0, .u = {.i32 = val } \
   }
 
 void LEPUS_SetPropertyFunctionList(LEPUSContext *ctx, LEPUSValueConst obj,

@@ -13,6 +13,8 @@ enum class PlatformRendererType : uint8_t {
   kScroll = 3,
   kText = 4,
   kImage = 5,
+  kList = 6,
+  kListItem = 7,
 };
 
 #endif  // CORE_PUBLIC_PLATFORM_RENDERER_TYPE_H_

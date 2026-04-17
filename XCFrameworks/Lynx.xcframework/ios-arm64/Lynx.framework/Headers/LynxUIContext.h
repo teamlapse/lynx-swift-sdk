@@ -6,14 +6,16 @@
 #import <Lynx/ListNodeInfoFetcherProtocol.h>
 #import <Lynx/LynxBaseGestureHandler.h>
 #import <Lynx/LynxEventEmitter.h>
+#import <Lynx/LynxFrameViewProvider.h>
 #import <Lynx/LynxGenericResourceFetcher.h>
+#import <Lynx/LynxImageConfig.h>
+#import <Lynx/LynxImageFetcher.h>
 #import <Lynx/LynxLifecycleDispatcher.h>
 #import <Lynx/LynxMediaResourceFetcher.h>
 #import <Lynx/LynxScreenMetrics.h>
 #import <Lynx/LynxScrollListener.h>
 #import <Lynx/LynxTemplateResourceFetcher.h>
 #import <Lynx/LynxUIListProtocol.h>
-#import "LynxImageFetcher.h"
 
 NS_ASSUME_NONNULL_BEGIN
 @class LynxRootUI;
@@ -62,8 +64,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, strong, nullable) id<LynxTemplateResourceFetcher> templateResourceFetcher;
 @property(nonatomic, assign) BOOL enableFetchUIImage;
 
-// image global property
-@property(nonatomic, nullable) NSString* imagePreviewHashMetadata;
+// LynxFrameViewProvider support
+@property(nonatomic, strong, nullable) id<LynxFrameViewProvider> lynxFrameViewProvider;
+
+@property(nonatomic, strong, nullable) LynxImageConfig* imageConfig;
 
 // settings
 @property(nonatomic, readonly) BOOL defaultOverflowVisible;
@@ -72,6 +76,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, readonly) BOOL defaultAutoResumeAnimation;
 @property(nonatomic, readonly) BOOL defaultEnableNewTransformOrigin;
 @property(nonatomic, readonly) BOOL enableEventRefactor;
+@property(nonatomic, readonly) BOOL enableiOSAnimationLayerForExposure;
 @property(nonatomic, readonly) BOOL enableA11yIDMutationObserver;
 @property(nonatomic, readonly) BOOL enableTextOverflow;
 @property(nonatomic, readonly) BOOL enableNewClipMode;

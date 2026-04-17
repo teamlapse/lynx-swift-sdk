@@ -284,16 +284,6 @@ typedef struct QJSDebuggerCallbacks2 {
 } QJSDebuggerCallbacks2;
 #endif
 
-typedef struct SettingsOption {
-  /*
-    If this value is true, quickjs will not adjust stack size
-     when stack size is unconsistent.
-  */
-  bool disable_adjust_stacksize;
-  bool disable_json_opt;
-  bool disable_deepclone_opt;
-  bool disable_separable_string;
-} SettingsOption;
 class GlobalHandles;
 class GarbageCollector;
 class PtrHandles;
@@ -383,9 +373,7 @@ struct LEPUSRuntime {
   int32_t next_script_id;  // next script id that can be used
 #endif
   // <Primjs begin>
-#ifdef ENABLE_PRIMJS_SNAPSHOT
   bool use_primjs;
-#endif
 #ifdef DUMP_LEAKS
   struct list_head string_list; /* list of JSString.link */
 #endif
@@ -406,9 +394,6 @@ struct LEPUSRuntime {
   bool gc_enable;
   bool is_lepusng;
   void *user_opaque;
-  // Primjs begin
-  SettingsOption settings_option;
-  // Primjs end
   JSMallocState malloc_state;
   void *gc_observer;
   int gc_depth;
@@ -676,6 +661,7 @@ typedef enum OPCodeEnum {
 } OPCodeEnum;
 
 struct FinalizationRegistryContext;
+constexpr size_t kFunctionShapeSize = 2;
 
 struct LEPUSContext {
   // <primjs begin>
@@ -693,6 +679,7 @@ struct LEPUSContext {
   int binary_object_size;
 
   JSShape *array_shape; /* initial shape for Array objects */
+  JSShape *function_shape[kFunctionShapeSize];
 
   LEPUSValue *class_proto;
   LEPUSValue function_proto;
@@ -944,6 +931,7 @@ typedef struct LEPUSFunctionBytecode {
     int pc2line_len;
 #ifdef ENABLE_QUICKJS_DEBUGGER
     int64_t column_num;
+    int32_t end_line_num;
 #endif
     uint8_t *pc2line_buf;
     char *source;
@@ -1562,18 +1550,10 @@ QJS_HIDE LEPUSValue JS_GetPropertyInternalImpl_GC(LEPUSContext *ctx,
                                                   JSAtom prop,
                                                   LEPUSValueConst this_obj,
                                                   BOOL throw_ref_error);
-QJS_HIDE void prim_js_print(const char *msg);
 QJS_HIDE void prim_js_print_gc(const char *msg);
-
-QJS_HIDE void prim_js_print_register(uint64_t reg_val);
-
-QJS_HIDE void prim_js_print_trace(int bytecode, int tos);
+QJS_HIDE void prim_js_print_register_gc(uint64_t reg_val);
 QJS_HIDE void prim_js_print_trace_gc(int bytecode, int tos);
-
-QJS_HIDE void prim_js_print_func(LEPUSContext *ctx, LEPUSValue func_obj);
 QJS_HIDE void prim_js_print_func_gc(LEPUSContext *ctx, LEPUSValue func_obj);
-
-QJS_HIDE void JS_FreeValueRef(LEPUSContext *ctx, LEPUSValue v);
 
 QJS_HIDE LEPUSValue js_closure(LEPUSContext *ctx, LEPUSValue bfunc,
                                JSVarRef **cur_var_refs, LEPUSStackFrame *sf);
@@ -1604,7 +1584,6 @@ QJS_HIDE LEPUSValue JS_NewSymbolFromAtom(LEPUSContext *ctx, JSAtom descr,
 QJS_HIDE LEPUSValue JS_NewSymbolFromAtom_GC(LEPUSContext *ctx, JSAtom descr,
                                             int atom_type);
 QJS_HIDE LEPUSValue JS_ToObject_GC(LEPUSContext *ctx, LEPUSValueConst val);
-QJS_HIDE LEPUSValue PRIM_JS_NewObject(LEPUSContext *ctx);
 QJS_HIDE LEPUSValue PRIM_JS_NewObject_GC(LEPUSContext *ctx);
 QJS_HIDE LEPUSValue js_build_arguments(LEPUSContext *ctx, int argc,
                                        LEPUSValueConst *argv);
@@ -1618,7 +1597,6 @@ QJS_HIDE LEPUSValue js_build_mapped_arguments_gc(LEPUSContext *ctx, int argc,
                                                  LEPUSValueConst *argv,
                                                  LEPUSStackFrame *sf,
                                                  int arg_count);
-QJS_HIDE void prim_close_var_refs(LEPUSContext *ctx, LEPUSStackFrame *sf);
 QJS_HIDE void prim_close_var_refs_gc(LEPUSContext *ctx, LEPUSStackFrame *sf);
 QJS_HIDE LEPUSValue js_build_rest(LEPUSContext *ctx, int first, int argc,
                                   LEPUSValueConst *argv);
@@ -1673,7 +1651,6 @@ QJS_HIDE LEPUSValue JS_GetPropertyValue_GC(LEPUSContext *ctx,
 QJS_HIDE int JS_DefineGlobalVar(LEPUSContext *ctx, JSAtom prop, int def_flags);
 QJS_HIDE int JS_DefineGlobalVar_GC(LEPUSContext *ctx, JSAtom prop,
                                    int def_flags);
-QJS_HIDE LEPUSValue PRIM_JS_NewArray(LEPUSContext *ctx);
 QJS_HIDE LEPUSValue PRIM_JS_NewArray_GC(LEPUSContext *ctx);
 
 QJS_HIDE LEPUSValue js_regexp_constructor_internal(LEPUSContext *ctx,
@@ -1776,8 +1753,7 @@ QJS_HIDE void prim_WriteBarrierNoStore(LEPUSValue value, LEPUSContext *ctx);
 QJS_HIDE void prim_HeapObjStoreLEPUSValue(void *fieldAddr, LEPUSValue value);
 QJS_HIDE void prim_HeapObjStorePtr(void *dstObj, address_t offset, void *value);
 QJS_HIDE LEPUSValue js_get_length(LEPUSContext *ctx, LEPUSValueConst obj);
-QJS_HIDE LEPUSValue prim_js_op_eval(LEPUSContext *ctx, int scope_idx,
-                                    LEPUSValue op1);
+
 QJS_HIDE LEPUSValue js_get_length(LEPUSContext *ctx, LEPUSValueConst obj);
 QJS_HIDE LEPUSValue prim_js_op_eval_gc(LEPUSContext *ctx, int scope_idx,
                                        LEPUSValue op1);
@@ -2201,6 +2177,8 @@ QJS_HIDE __attribute__((unused)) bool CheckValidPtr_GC(void *runtime,
 QJS_HIDE JSString *js_alloc_string(LEPUSContext *ctx, int max_len,
                                    int is_wide_char);
 QJS_HIDE int JS_InitAtoms(LEPUSRuntime *rt);
+QJS_HIDE LEPUSValue gc(LEPUSContext *ctx, LEPUSValueConst this_val, int argc,
+                       LEPUSValueConst *argv);
 QJS_HIDE int JS_isConcatSpreadable(LEPUSContext *ctx, LEPUSValueConst obj);
 typedef struct StringBuffer {
   LEPUSContext *ctx;
@@ -2406,7 +2384,7 @@ QJS_HIDE int JS_DefineAutoInitProperty_GC(
     LEPUSContext *ctx, LEPUSValueConst this_obj, JSAtom prop,
     LEPUSValue (*init_func)(LEPUSContext *ctx, LEPUSObject *obj, JSAtom prop,
                             void *opaque),
-    void *opaque, int flags);
+    void *opaque, int flags, bool need_find_prop = true);
 QJS_HIDE int js_link_module(LEPUSContext *ctx, LEPUSModuleDef *m);
 QJS_HIDE int skip_spaces(const char *pc);
 int JS_DefineObjectName_GC(LEPUSContext *ctx, LEPUSValueConst obj, JSAtom name,
@@ -2806,6 +2784,7 @@ typedef struct JSFunctionDef {
   /* pc2line table */
   JSAtom filename;
   int line_num;
+  int end_line_num;
 #ifdef ENABLE_QUICKJS_DEBUGGER
   int64_t column_num;
   LEPUSScriptSource *script;
@@ -2999,8 +2978,6 @@ typedef struct FinalizerOpaque {
 bool JS_IsNewVersion(LEPUSContext *ctx);
 bool JS_CheckBytecodeVersion(uint64_t v64);
 
-QJS_HIDE bool primjs_snapshot_enabled();
-
 QJS_HIDE void DeleteCurNode(LEPUSRuntime *rt, void *node, int type);
 QJS_HIDE bool CheckValidNode(LEPUSRuntime *rt, void *node, int type);
 
@@ -3076,42 +3053,6 @@ class TraceManager {
 #endif /* ENABLE_QUICKJS_DEBUGGER */
 
 int64_t date_now();
-
-inline bool json_opt_disabled() { return JSON_OPT_DISABLE & settingsFlag; }
-inline bool json_opt_disabled(LEPUSRuntime *rt) {
-  return rt->settings_option.disable_json_opt;
-}
-inline bool deepclone_opt_disabled() {
-  return DEEPCLONE_OPT_DISABLE & settingsFlag;
-}
-
-inline bool deepclone_opt_disabled(LEPUSRuntime *rt) {
-  return rt->settings_option.disable_deepclone_opt;
-}
-
-inline bool separable_string_disabled() {
-  return DISABLE_SEPARABLE_STRING & settingsFlag;
-}
-
-inline bool minify_virtual_stack_size_enabled() {
-  return settingsFlag & MINIFY_STACK_ENABLE;
-}
-
-inline bool separable_string_disabled(LEPUSRuntime *rt) {
-  return rt->settings_option.disable_separable_string;
-}
-
-inline bool adjust_stacksize_disabled() {
-  return DISABLE_ADJUST_STACKSIZE & settingsFlag;
-}
-
-inline void js_init_settings_options(LEPUSRuntime *rt) {
-  rt->settings_option.disable_adjust_stacksize = adjust_stacksize_disabled();
-  rt->settings_option.disable_json_opt = json_opt_disabled();
-  rt->settings_option.disable_deepclone_opt = deepclone_opt_disabled();
-  rt->settings_option.disable_separable_string = separable_string_disabled();
-  return;
-}
 
 inline bool js_is_bytecode_function(LEPUSValue obj) {
   return (LEPUS_VALUE_IS_OBJECT(obj)) &&
@@ -3199,6 +3140,14 @@ inline uintptr_t get_thread_stack_limit2() {
 uint32_t map_hash_key(LEPUSContext *ctx, LEPUSValueConst key,
                       uint32_t hash_bits);
 
+#define JS_NEW_CTOR_NO_GLOBAL (1 << 0) /* don't create a global binding */
+#define JS_NEW_CTOR_PROTO_CLASS \
+  (1 << 1) /* the prototype class is 'class_id' instead of JS_CLASS_OBJECT */
+#define JS_NEW_CTOR_PROTO_EXIST                                           \
+  (1 << 2)                            /* the prototype is already defined \
+                                       */
+#define JS_NEW_CTOR_READONLY (1 << 3) /* read-only constructor field */
+
 #ifdef ENABLE_VIRTUAL_STACK
 
 class VirtualStack {
@@ -3238,4 +3187,31 @@ class VirtualStack {
 };
 
 #endif
+QJS_HIDE LEPUSValue js_throw_type_error(LEPUSContext *ctx,
+                                        LEPUSValueConst this_val, int argc,
+                                        LEPUSValueConst *argv);
+inline const LEPUSCFunctionListEntry js_typed_array_funcs[] = {
+    LEPUS_PROP_INT32_DEF("BYTES_PER_ELEMENT", 1, 0),
+    LEPUS_PROP_INT32_DEF("BYTES_PER_ELEMENT", 2, 0),
+    LEPUS_PROP_INT32_DEF("BYTES_PER_ELEMENT", 4, 0),
+    LEPUS_PROP_INT32_DEF("BYTES_PER_ELEMENT", 8, 0),
+};
+
+inline const LEPUSCFunctionListEntry js_native_error_proto_funcs[] = {
+#define DEF(name)                                                     \
+  LEPUS_PROP_ATOM_DEF("name", name,                                   \
+                      LEPUS_PROP_WRITABLE | LEPUS_PROP_CONFIGURABLE), \
+      LEPUS_PROP_STRING_DEF("message", "",                            \
+                            LEPUS_PROP_WRITABLE | LEPUS_PROP_CONFIGURABLE),
+
+    DEF(JS_ATOM_EvalError) DEF(JS_ATOM_RangeError) DEF(JS_ATOM_ReferenceError)
+        DEF(JS_ATOM_SyntaxError) DEF(JS_ATOM_TypeError) DEF(JS_ATOM_URIError)
+            DEF(JS_ATOM_InternalError) LEPUS_PROP_STRING_DEF(
+                "name", "AggregateError",
+                LEPUS_PROP_WRITABLE | LEPUS_PROP_CONFIGURABLE),
+    LEPUS_PROP_STRING_DEF("message", "",
+                          LEPUS_PROP_WRITABLE | LEPUS_PROP_CONFIGURABLE),
+#undef DEF
+};
+
 #endif  // SRC_INTERPRETER_QUICKJS_INCLUDE_QUICKJS_INNER_H_

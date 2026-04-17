@@ -296,11 +296,6 @@ inline constexpr const char* const STYLE_SHEET_MANAGER_GET_STYLE_SHEET =
     "CSSStyleSheetManager::GetCSSStyleSheet";
 inline constexpr const char* const CSS_HANDLER_GET_VARIABLE_BY_RULE =
     "CSSVariableHandler::GetCSSVariableByRule";
-inline constexpr const char* const DYNAMIC_STYLE_MANAGER_ADOPT_SHEET =
-    "DynamicCSSStylesManager::AdoptStyle";
-inline constexpr const char* const
-    DYNAMIC_STYLE_MANAGER_UPDATE_RESOLVING_STATUS =
-        "DynamicCSSStylesManager::UpdateWithResolvingStatus";
 inline constexpr const char* const SHARED_FRAGMENT_INIT_PSEUDO_NOT_STYLE =
     "SharedCSSFragment::InitPseudoNotStyle";
 inline constexpr const char* const UNIT_HANDLER_PROCESS =
@@ -332,6 +327,8 @@ inline constexpr const char* const ELEMENT_MANAGER_CREATE_NODE =
     "ElementManager::CreateNode";
 inline constexpr const char* const ELEMENT_MANAGER_REQUEST_LAYOUT =
     "ElementManager::RequestLayout";
+inline constexpr const char* const ELEMENT_MANAGER_REPAINT =
+    "ElementManager::Repaint";
 inline constexpr const char* const ELEMENT_MANAGER_ON_PATCH_FINISH_INNER =
     "ElementManager::OnPatchFinishInner";
 inline constexpr const char* const ELEMENT_MANAGER_ON_PATCH_FINISH_FOR_AIR =
@@ -351,8 +348,6 @@ inline constexpr const char* const ELEMENT_MANAGER_UPDATE_Z_INDEX_LIST =
     "ElementManager::UpdateZIndexList";
 inline constexpr const char* const ELEMENT_VSYNC_PROXY_FRAME_TIME =
     "ElementVsyncProxy::VsyncFrameTime";
-inline constexpr const char* const RESOLVE_ATTRIBUTES_AND_STYLE =
-    "ResolveAttributesAndStyle";
 inline constexpr const char* const ELEMENT_UPDATE_LAYOUT =
     "Element::UpdateLayout";
 inline constexpr const char* const ELEMENT_SET_STYLE_INTERNAL =
@@ -448,6 +443,10 @@ inline constexpr const char* const LEPUS_DECODER_WRITE_JS_VALUE =
  * to the layout node. This stage will also create and modify layout node tree.
  * At the same time, it will also generate platform UI operations.
  */
+inline constexpr const char* const FIBER_ELEMENT_CONSTRUCTOR =
+    "FiberElement::Constructor";
+inline constexpr const char* const FIBER_ELEMENT_DESTRUCTOR =
+    "FiberElement::Destructor";
 inline constexpr const char* const FIBER_ELEMENT_FLUSH_ACTIONS =
     "FiberElement::FlushActions";
 inline constexpr const char* const COMPONENT_ELEMENT_PREPARE_ROOT_CSS =
@@ -523,6 +522,8 @@ inline constexpr const char* const FIBER_ELEMENT_HANDLE_INSERT_CHILD_ACTION =
     "FiberElement::HandleInsertChildAction";
 inline constexpr const char* const FIBER_ELEMENT_HANDLE_REMOVE_CHILD_ACTION =
     "FiberElement::HandleRemoveChildAction";
+inline constexpr const char* const FIBER_ELEMENT_HANDLE_REMOVE_SELF =
+    "FiberElement::HandleRemoveSelf";
 inline constexpr const char* const FIBER_ELEMENT_HANDLE_CONTAINER_INSERTION =
     "FiberElement::HandleContainerInsertion";
 inline constexpr const char* const FIBER_ELEMENT_CONSUME_STYLE =
@@ -768,19 +769,6 @@ inline constexpr const char* const RADON_LIST_BASE_UPDATE_COMPONENT =
     "RadonListBase::UpdateComponent";
 inline constexpr const char* const RADON_LIST_BASE_DIFF_COMPONENTS =
     "RadonListBase::DiffListComponents";
-
-inline constexpr const char* const RADON_ELEMENT_SET_NATIVE_PROPS =
-    "RadonElement::SetNativeProps";
-inline constexpr const char* const RADON_ELEMENT_UPDATE_DYNAMIC_STYLE =
-    "Element.PreparePropsBundleForDynamicCSS";
-inline constexpr const char* const RADON_ELEMENT_FLUSH_PROPS =
-    "RadonElement::FlushProps";
-inline constexpr const char* const RADON_ELEMENT_ON_PSEUDO_STATUS_CHANGED =
-    "RadonElement::OnPseudoStatusChanged";
-inline constexpr const char* const RADON_ELEMENT_CONSUME_STYLE =
-    "RadonElement::ConsumeStyle";
-inline constexpr const char* const RADON_ELEMENT_FLUSH_ANIMATED_STYLE =
-    "RadonElement::FlushAnimatedStyleInternal";
 
 inline constexpr const char* const LAZY_COMPONENT_DERIVE_FROM_MOULD =
     "LazyComponent::DeriveFromMould";
@@ -1068,6 +1056,20 @@ inline constexpr const char* const PAINTING_CONTEXT_FINISH_TASM_OPERATION =
     "FinishTasmOperation";
 inline constexpr const char* const PAINTING_CONTEXT_CLEAN_OPTIONS_FOR_TIMING =
     "CleanOptionsForTiming";
+/**
+ * @trace_description: Reconstruct platform event target tree recursively, which
+ * is used for platform event target exposure check, hit-test and execute ui
+ * method.
+ */
+inline constexpr const char* const
+    NATIVE_PAINTING_CONTEXT_RECONSTRUCT_EVENT_TARGET_TREE =
+        "NativePaintingCtxPlatformRef::ReconstructEventTargetTreeRecursively";
+/**
+ * @trace_description: Do exposure check for platform event target. The main
+ * function is to detect viewport intersections between targets.
+ */
+inline constexpr const char* const EXPOSURE_DO_EXPOSURE_CHECK =
+    "PlatformEventTargetExposure::DoExposureCheck";
 inline constexpr const char* const UI_OPERATION_QUEUE_INSERT_PAINTING_TASK =
     "UIOperationQueue::InsertPaintingNodeTask";
 inline constexpr const char* const UI_OPERATION_QUEUE_REMOVE_PAINTING_TASK =

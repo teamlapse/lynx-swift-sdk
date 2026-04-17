@@ -28,10 +28,13 @@ class BaseElementContainer {
     kNeedSortZChild = 1 << 0,
     kNeedSortFixedChild = 1 << 1,
     kNeedRedraw = 1 << 2,
+    kNeedUpdateSubtreeProperty = 1 << 3
   };
 
   explicit BaseElementContainer(Element* element);
   virtual ~BaseElementContainer();
+
+  virtual bool HasUIPrimitive() const = 0;
 
   void set_parent(BaseElementContainer* parent) { parent_ = parent; }
   BaseElementContainer* parent() const { return parent_; }
@@ -58,6 +61,23 @@ class BaseElementContainer {
   }
 
   void MarkDirtyState(DirtyState state);
+
+  // Marks this container as needing a full redraw, propagating to ancestors.
+  void InvalidateForRedraw() {
+    if (NeedRedraw()) {
+      return;
+    }
+    MarkDirtyState(kNeedRedraw);
+    if (parent()) {
+      parent()->InvalidateForRedraw();
+    }
+  }
+
+  // Marks this container as needing subtree property update (e.g., transform,
+  // opacity). This is a lighter-weight invalidation than full redraw.
+  void InvalidateForSubtreeProperty() {
+    MarkDirtyState(kNeedUpdateSubtreeProperty);
+  }
 
   /**
    * Add element container to correct parent(if layout_only contained)
@@ -97,9 +117,13 @@ class BaseElementContainer {
   virtual void ListCellWillAppear(const std::string& item_key);
   virtual void ListCellDisappear(bool is_exist, const base::String& item_key);
   virtual void ListReusePaintingNode(int32_t child_id,
-                                     const std::string& item_key);
-  virtual void InsertListItemPaintingNode(int32_t child_id);
-  virtual void RemoveListItemPaintingNode(int32_t child_id);
+                                     const base::String& item_key);
+  virtual void InsertListItemPaintingNode(int32_t child_id) = 0;
+  virtual void RemoveListItemPaintingNode(int32_t child_id) = 0;
+  virtual void UpdateContentOffsetForListContainer(float content_size,
+                                                   float delta_x, float delta_y,
+                                                   bool is_init_scroll_offset,
+                                                   bool from_layout) = 0;
 
   virtual std::vector<float> ScrollBy(float width, float height);
   virtual std::vector<float> GetRectToLynxView();
@@ -109,10 +133,6 @@ class BaseElementContainer {
       const std::string& method, const pub::Value& params,
       const std::function<void(int32_t code, const pub::Value& data)>&
           callback);
-  virtual void UpdateContentOffsetForListContainer(float content_size,
-                                                   float delta_x, float delta_y,
-                                                   bool is_init_scroll_offset,
-                                                   bool from_layout);
 
   virtual void SetGestureDetectorState(int32_t gesture_id, int32_t state);
   virtual void ConsumeGesture(int32_t gesture_id, const lepus::Value& params);
@@ -130,8 +150,11 @@ class BaseElementContainer {
   virtual void FinishLayoutOperation(
       const std::shared_ptr<PipelineOptions>& options);
   virtual void MarkLayoutUIOperationQueueFlushStartIfNeed();
+  void UpdateGlobalInsertionOrder();
 
  protected:
+  virtual bool is_fragment() const { return false; }
+
   bool IsRootContainer() const;
 
   bool has_z_child() const { return has_z_child_; }
@@ -150,6 +173,15 @@ class BaseElementContainer {
     return dirty_state_ & DirtyState::kNeedSortFixedChild;
   }
   bool NeedRedraw() const { return dirty_state_ & DirtyState::kNeedRedraw; }
+  bool NeedUpdateSubtreeProperty() const {
+    return dirty_state_ & DirtyState::kNeedUpdateSubtreeProperty;
+  }
+
+  void ClearPaintDirtyState() {
+    dirty_state_ = static_cast<DirtyState>(
+        dirty_state_ &
+        (~(DirtyState::kNeedRedraw | DirtyState::kNeedUpdateSubtreeProperty)));
+  }
 
   BaseElementContainer* EnclosingStackingContextNode();
 
@@ -167,11 +199,20 @@ class BaseElementContainer {
 
   DirtyState dirty_state_{0};
 
+  /**
+   * A globally unique sequential identifier representing
+   * the chronological position at which this element container  was
+   * inserted into the parent element container relative to all other element
+   * containers..
+   */
+  uint32_t global_insertion_order_{kInitialGlobalInsertionOrder};
+
  private:
   Element* element_{nullptr};
   ElementManager* manager_{nullptr};
 
   BaseElementContainer* parent_{nullptr};
+  int32_t id_{0};
 };
 
 }  // namespace tasm

@@ -9,6 +9,10 @@
 
 #include "js_native_api.h"
 
+#ifdef USE_PRIMJS_NAPI
+#include "primjs_napi_defines.h"
+#endif
+
 EXTERN_C_START
 
 NAPI_EXTERN void napi_attach_jsc(napi_env env, JSGlobalContextRef global_ctx);
@@ -24,5 +28,9 @@ NAPI_EXTERN napi_value napi_jsc_value_to_js_value(napi_env env,
                                                   JSValueRef value);
 
 EXTERN_C_END
+
+#ifdef USE_PRIMJS_NAPI
+#include "primjs_napi_undefs.h"
+#endif
 
 #endif  // SRC_NAPI_JSC_NAPI_ENV_JSC_H_

@@ -14,15 +14,18 @@
 
 #include "base/include/no_destructor.h"
 #include "core/public/prop_bundle.h"
+#include "core/public/pub_value.h"
 #include "core/renderer/data/template_data.h"
 #include "core/renderer/dom/vdom/radon/node_select_options.h"
+#include "core/renderer/layout_scheduler/layout_scheduler.h"
 #include "core/renderer/template_assembler.h"
 #include "core/renderer/ui_wrapper/layout/list_node.h"
-#include "core/runtime/piper/js/template_delegate.h"
-#include "core/runtime/piper/js/update_data_type.h"
+#include "core/runtime/js/template_delegate.h"
+#include "core/runtime/js/update_data_type.h"
 #include "core/shell/common/platform_call_back.h"
 #include "core/shell/lynx_card_cache_data_manager.h"
 #include "core/shell/tasm_operation_queue.h"
+#include "core/shell/update_mode.h"
 #include "core/template_bundle/template_codec/binary_decoder/page_config.h"
 
 namespace lynx {
@@ -32,10 +35,12 @@ class LynxEngine {
  public:
   class Delegate : public tasm::ElementManager::Delegate,
                    public tasm::TemplateAssembler::Delegate,
-                   public tasm::TemplateAssembler::LayoutScheduler {
+                   public tasm::LayoutScheduler::LayoutSchedulerImpl {
    public:
     Delegate() = default;
     ~Delegate() override = default;
+
+    using tasm::TemplateAssembler::Delegate::InvokeUIMethod;
 
     virtual void NotifyJSUpdatePageData() = 0;
     virtual void BindPipelineIDWithTimingFlag(
@@ -45,6 +50,11 @@ class LynxEngine {
         const tasm::PipelineID& pipeline_id,
         const tasm::PipelineOrigin& pipeline_origin,
         tasm::timing::TimestampUs pipeline_start_timestamp) override = 0;
+
+    virtual void InvokeUIMethod(tasm::LynxGetUIResult ui_result,
+                                const std::string& method,
+                                const pub::Value& params,
+                                piper::ApiCallBack callback) = 0;
   };
 
   explicit LynxEngine(
@@ -86,6 +96,7 @@ class LynxEngine {
   void UpdateMetaData(const std::shared_ptr<tasm::TemplateData>& data,
                       const lepus::Value& global_props,
                       uint32_t native_update_data_order,
+                      LynxUpdateMode update_mode,
                       std::shared_ptr<tasm::PipelineOptions> pipeline_options);
 
   void ReloadTemplate(const std::shared_ptr<tasm::TemplateData>& data,
@@ -116,6 +127,8 @@ class LynxEngine {
                       int32_t height_mode, bool need_layout = true);
 
   void SyncFetchLayoutResult();
+
+  void SendEvent(int32_t target_id, fml::RefPtr<event::Event> event);
 
   void SendAirPageEvent(const std::string& name, const lepus_value& params);
 
@@ -259,6 +272,10 @@ class LynxEngine {
                       const tasm::NodeSelectOptions& options,
                       const std::string& method,
                       fml::RefPtr<tasm::PropBundle> params,
+                      piper::ApiCallBack callback);
+  void InvokeUIMethod(const tasm::NodeSelectRoot& root,
+                      const tasm::NodeSelectOptions& options,
+                      const std::string& method, const pub::Value& params,
                       piper::ApiCallBack callback);
 
   void GetPathInfo(const tasm::NodeSelectRoot& root,

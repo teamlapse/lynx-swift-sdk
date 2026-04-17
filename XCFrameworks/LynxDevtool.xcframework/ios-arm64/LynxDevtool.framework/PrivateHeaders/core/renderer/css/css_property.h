@@ -43,24 +43,25 @@ static constexpr PseudoState kPseudoStateSelection = 1 << 11;
   V(AnimationDirection, "direction")         \
   V(AnimationPlayState, "play-state")
 
-#define ALL_ANIMATABLE_PROPERTY_ID                                         \
-  tasm::kPropertyIDTop, tasm::kPropertyIDLeft, tasm::kPropertyIDRight,     \
-      tasm::kPropertyIDBottom, tasm::kPropertyIDWidth,                     \
-      tasm::kPropertyIDHeight, tasm::kPropertyIDBackgroundColor,           \
-      tasm::kPropertyIDColor, tasm::kPropertyIDOpacity,                    \
-      tasm::kPropertyIDBorderLeftColor, tasm::kPropertyIDBorderRightColor, \
-      tasm::kPropertyIDBorderTopColor, tasm::kPropertyIDBorderBottomColor, \
-      tasm::kPropertyIDBorderLeftWidth, tasm::kPropertyIDBorderRightWidth, \
-      tasm::kPropertyIDBorderTopWidth, tasm::kPropertyIDBorderBottomWidth, \
-      tasm::kPropertyIDPaddingLeft, tasm::kPropertyIDPaddingRight,         \
-      tasm::kPropertyIDPaddingTop, tasm::kPropertyIDPaddingBottom,         \
-      tasm::kPropertyIDMarginLeft, tasm::kPropertyIDMarginRight,           \
-      tasm::kPropertyIDMarginTop, tasm::kPropertyIDMarginBottom,           \
-      tasm::kPropertyIDMaxWidth, tasm::kPropertyIDMinWidth,                \
-      tasm::kPropertyIDMaxHeight, tasm::kPropertyIDMinHeight,              \
-      tasm::kPropertyIDFlexGrow, tasm::kPropertyIDFlexBasis,               \
-      tasm::kPropertyIDFilter, tasm::kPropertyIDTransform,                 \
-      tasm::kPropertyIDOffsetDistance, tasm::kPropertyIDBackgroundPosition
+#define ALL_ANIMATABLE_PROPERTY_ID                                          \
+  tasm::kPropertyIDTop, tasm::kPropertyIDLeft, tasm::kPropertyIDRight,      \
+      tasm::kPropertyIDBottom, tasm::kPropertyIDWidth,                      \
+      tasm::kPropertyIDHeight, tasm::kPropertyIDBackgroundColor,            \
+      tasm::kPropertyIDColor, tasm::kPropertyIDOpacity,                     \
+      tasm::kPropertyIDBorderLeftColor, tasm::kPropertyIDBorderRightColor,  \
+      tasm::kPropertyIDBorderTopColor, tasm::kPropertyIDBorderBottomColor,  \
+      tasm::kPropertyIDBorderLeftWidth, tasm::kPropertyIDBorderRightWidth,  \
+      tasm::kPropertyIDBorderTopWidth, tasm::kPropertyIDBorderBottomWidth,  \
+      tasm::kPropertyIDPaddingLeft, tasm::kPropertyIDPaddingRight,          \
+      tasm::kPropertyIDPaddingTop, tasm::kPropertyIDPaddingBottom,          \
+      tasm::kPropertyIDMarginLeft, tasm::kPropertyIDMarginRight,            \
+      tasm::kPropertyIDMarginTop, tasm::kPropertyIDMarginBottom,            \
+      tasm::kPropertyIDMaxWidth, tasm::kPropertyIDMinWidth,                 \
+      tasm::kPropertyIDMaxHeight, tasm::kPropertyIDMinHeight,               \
+      tasm::kPropertyIDFlexGrow, tasm::kPropertyIDFlexBasis,                \
+      tasm::kPropertyIDFilter, tasm::kPropertyIDTransform,                  \
+      tasm::kPropertyIDOffsetDistance, tasm::kPropertyIDBackgroundPosition, \
+      tasm::kPropertyIDTransformOrigin
 
 #define FOREACH_NEW_ANIMATOR_PROPERTY(V)              \
   V(kPropertyIDLeft, kLeft)                           \
@@ -96,6 +97,7 @@ static constexpr PseudoState kPseudoStateSelection = 1 << 11;
   V(kPropertyIDFlexBasis, kFlexBasis)                 \
   V(kPropertyIDFilter, kFilter)                       \
   V(kPropertyIDTransform, kTransform)                 \
+  V(kPropertyIDTransformOrigin, kTransformOrigin)     \
   V(kPropertyIDOffsetDistance, kOffsetDistance)       \
   V(kPropertyIDBackgroundPosition, kBackgroundPosition)
 
@@ -173,9 +175,24 @@ static constexpr PseudoState kPseudoStateSelection = 1 << 11;
   V(RelativeRightOf, false, kPropertyIDRelativeRightOf,                        \
     kPropertyIDRelativeLeftOf)
 
-using StyleMap = base::LinkedHashMap<CSSPropertyID, tasm::CSSValue>;
+// This key-policy class specifies that the key-value storage method for
+// `StyleMap` is in the form `kkkvvv...`, meaning the key is stored
+// independently and used as a hash value to speed up lookups. Simultaneously,
+// `assign_existing_for_merge` configures the `Merge()` interface to assign
+// values to existing keys. This is because, by default, the `Merge()`
+// interface of `base::LinearFlatMap` behaves the same as `std::unordered_map`,
+// skipping existing keys.
+struct MapKeyPolicyCSSPropertyID
+    : public base::MapKeyPolicyConsecutiveIntegers<CSSPropertyID> {
+  static constexpr auto assign_existing_for_merge = true;
+};
+
+using StyleMap =
+    base::LinearFlatMap<CSSPropertyID, CSSValue, MapKeyPolicyCSSPropertyID>;
+static_assert(StyleMap::container_type::is_trivially_relocatable);
+
 using CSSVariableMap = base::LinearFlatMap<base::String, base::String>;
-using CSSValueMap = base::LinkedHashMap<base::String, tasm::CSSValue>;
+using CSSValueMap = base::LinearFlatMap<base::String, tasm::CSSValue>;
 using ParsedStyles = std::pair<StyleMap, CSSVariableMap>;
 // TODO(yuyang), choose proper map type
 using ParsedStylesMap =
@@ -185,8 +202,10 @@ using AirCompStylesMap =
     std::unordered_map<std::string, std::shared_ptr<StyleMap>>;
 using AirParsedStylesMap = std::unordered_map<std::string, AirCompStylesMap>;
 
-using RawStyleMap = base::LinkedHashMap<CSSPropertyID, tasm::CSSValue>;
-using RawLepusStyleMap = base::LinkedHashMap<CSSPropertyID, lepus::Value>;
+using RawStyleMap = StyleMap;
+using RawLepusStyleMap =
+    base::LinearFlatMap<CSSPropertyID, lepus::Value, MapKeyPolicyCSSPropertyID>;
+static_assert(RawLepusStyleMap::container_type::is_trivially_relocatable);
 
 constexpr int kCSSPropertyCount = kPropertyEnd;
 

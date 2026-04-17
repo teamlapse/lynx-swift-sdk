@@ -4,6 +4,8 @@
 #import <Foundation/Foundation.h>
 #import "LynxPerformanceEntry.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface LynxJSBlockingEntry : LynxPerformanceEntry
 @property(nonatomic, strong) NSString* stage;
 @property(nonatomic, strong) NSNumber* total_blocking_time;
@@ -14,3 +16,5 @@
 @property(nonatomic, strong) NSNumber* time_after_fcp;
 - (instancetype)initWithDictionary:(NSDictionary*)dictionary;
 @end
+
+NS_ASSUME_NONNULL_END

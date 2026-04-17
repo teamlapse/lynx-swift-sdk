@@ -1,8 +1,8 @@
 // Copyright 2019 The Lynx Authors. All rights reserved.
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
-#ifndef CORE_RUNTIME_VM_LEPUS_MATH_API_H_
-#define CORE_RUNTIME_VM_LEPUS_MATH_API_H_
+#ifndef CORE_RUNTIME_LEPUS_MATH_API_H_
+#define CORE_RUNTIME_LEPUS_MATH_API_H_
 
 #include <math.h>
 #include <time.h>
@@ -13,131 +13,144 @@
 namespace lynx {
 namespace lepus {
 
-Value Sin(VMContext* context) {
-  Value* arg = context->GetParam(0);
+RestrictedValue Sin(VMContext* context) {
+  auto* arg = context->GetParam(0);
   if (!arg->IsNumber()) {
-    return Value();
+    return RestrictedValue();
   }
-  return Value(sin(arg->Number()));
-}
-Value Acos(VMContext* context) {
-  Value* arg = context->GetParam(0);
-  if (!arg->IsNumber()) {
-    return Value();
-  }
-  return Value(acos(arg->Number()));
+  return RestrictedValue(sin(arg->Number()));
 }
 
-Value Asin(VMContext* context) {
-  Value* arg = context->GetParam(0);
+RestrictedValue Acos(VMContext* context) {
+  auto* arg = context->GetParam(0);
   if (!arg->IsNumber()) {
-    return Value();
+    return RestrictedValue();
   }
-  return Value(asin(arg->Number()));
+  return RestrictedValue(acos(arg->Number()));
 }
 
-Value Abs(VMContext* context) {
-  Value* arg = context->GetParam(0);
+RestrictedValue Asin(VMContext* context) {
+  auto* arg = context->GetParam(0);
   if (!arg->IsNumber()) {
-    return Value();
+    return RestrictedValue();
   }
-  return Value(fabs(arg->Number()));
+  return RestrictedValue(asin(arg->Number()));
 }
 
-Value Atan(VMContext* context) {
-  Value* arg = context->GetParam(0);
+RestrictedValue Abs(VMContext* context) {
+  auto* arg = context->GetParam(0);
   if (!arg->IsNumber()) {
-    return Value();
+    return RestrictedValue();
   }
-  return Value(atan(arg->Number()));
+  return RestrictedValue(fabs(arg->Number()));
 }
-Value Ceil(VMContext* context) {
-  Value* arg = context->GetParam(0);
+
+RestrictedValue Atan(VMContext* context) {
+  auto* arg = context->GetParam(0);
   if (!arg->IsNumber()) {
-    return Value();
+    return RestrictedValue();
   }
-  return Value(ceil(arg->Number()));
+  return RestrictedValue(atan(arg->Number()));
 }
-Value Cos(VMContext* context) {
-  Value* arg = context->GetParam(0);
+
+RestrictedValue Ceil(VMContext* context) {
+  auto* arg = context->GetParam(0);
   if (!arg->IsNumber()) {
-    return Value();
+    return RestrictedValue();
   }
-  return Value(cos(arg->Number()));
+  return RestrictedValue(ceil(arg->Number()));
 }
-Value Exp(VMContext* context) {
-  Value* arg = context->GetParam(0);
+
+RestrictedValue Cos(VMContext* context) {
+  auto* arg = context->GetParam(0);
   if (!arg->IsNumber()) {
-    return Value();
+    return RestrictedValue();
   }
-  return Value(exp(arg->Number()));
+  return RestrictedValue(cos(arg->Number()));
 }
-Value Floor(VMContext* context) {
-  Value* arg = context->GetParam(0);
+
+RestrictedValue Exp(VMContext* context) {
+  auto* arg = context->GetParam(0);
   if (!arg->IsNumber()) {
-    return Value();
+    return RestrictedValue();
   }
-  return Value(floor(arg->Number()));
+  return RestrictedValue(exp(arg->Number()));
 }
-Value Log(VMContext* context) {
-  Value* arg = context->GetParam(0);
+
+RestrictedValue Floor(VMContext* context) {
+  auto* arg = context->GetParam(0);
   if (!arg->IsNumber()) {
-    return Value();
+    return RestrictedValue();
   }
-  return Value(log(arg->Number()));
+  return RestrictedValue(floor(arg->Number()));
 }
-Value Max(VMContext* context) {
-  Value* arg1 = context->GetParam(0);
-  Value* arg2 = context->GetParam(1);
+
+RestrictedValue Log(VMContext* context) {
+  auto* arg = context->GetParam(0);
+  if (!arg->IsNumber()) {
+    return RestrictedValue();
+  }
+  return RestrictedValue(log(arg->Number()));
+}
+
+RestrictedValue Max(VMContext* context) {
+  auto* arg1 = context->GetParam(0);
+  auto* arg2 = context->GetParam(1);
   if (!arg1->IsNumber() || !arg2->IsNumber()) {
-    return Value();
+    return RestrictedValue();
   }
-  return Value(fmax(arg1->Number(), arg2->Number()));
+  return RestrictedValue(fmax(arg1->Number(), arg2->Number()));
 }
-Value Min(VMContext* context) {
-  Value* arg1 = context->GetParam(0);
-  Value* arg2 = context->GetParam(1);
+
+RestrictedValue Min(VMContext* context) {
+  auto* arg1 = context->GetParam(0);
+  auto* arg2 = context->GetParam(1);
   if (!arg1->IsNumber() || !arg2->IsNumber()) {
-    return Value();
+    return RestrictedValue();
   }
-  return Value(fmin(arg1->Number(), arg2->Number()));
+  return RestrictedValue(fmin(arg1->Number(), arg2->Number()));
 }
-Value Pow(VMContext* context) {
-  Value* arg1 = context->GetParam(0);
-  Value* arg2 = context->GetParam(1);
+
+RestrictedValue Pow(VMContext* context) {
+  auto* arg1 = context->GetParam(0);
+  auto* arg2 = context->GetParam(1);
   if (!arg1->IsNumber() || !arg2->IsNumber()) {
-    return Value();
+    return RestrictedValue();
   }
-  return Value(pow(arg1->Number(), arg2->Number()));
+  return RestrictedValue(pow(arg1->Number(), arg2->Number()));
 }
-Value Random(VMContext* context) {
+RestrictedValue Random(VMContext* context) {
   static bool seeded = false;
   if (!seeded) {
     seeded = true;
     srand(static_cast<unsigned int>(time(NULL)));
   }
-  return Value(static_cast<float>(rand()) / static_cast<float>(RAND_MAX));
+  return RestrictedValue(static_cast<float>(rand()) /
+                         static_cast<float>(RAND_MAX));
 }
-Value Round(VMContext* context) {
-  Value* arg = context->GetParam(0);
+
+RestrictedValue Round(VMContext* context) {
+  auto* arg = context->GetParam(0);
   if (!arg->IsNumber()) {
-    return Value();
+    return RestrictedValue();
   }
-  return Value((int32_t)round(arg->Number()));
+  return RestrictedValue((int32_t)round(arg->Number()));
 }
-Value Sqrt(VMContext* context) {
-  Value* arg = context->GetParam(0);
+
+RestrictedValue Sqrt(VMContext* context) {
+  auto* arg = context->GetParam(0);
   if (!arg->IsNumber()) {
-    return Value();
+    return RestrictedValue();
   }
-  return Value(sqrt(arg->Number()));
+  return RestrictedValue(sqrt(arg->Number()));
 }
-Value Tan(VMContext* context) {
-  Value* arg = context->GetParam(0);
+
+RestrictedValue Tan(VMContext* context) {
+  auto* arg = context->GetParam(0);
   if (!arg->IsNumber()) {
-    return Value();
+    return RestrictedValue();
   }
-  return Value(tan(arg->Number()));
+  return RestrictedValue(tan(arg->Number()));
 }
 
 void RegisterMathAPI(Context* ctx) {
@@ -165,4 +178,4 @@ void RegisterMathAPI(Context* ctx) {
 }
 }  // namespace lepus
 }  // namespace lynx
-#endif  // CORE_RUNTIME_VM_LEPUS_MATH_API_H_
+#endif  // CORE_RUNTIME_LEPUS_MATH_API_H_

@@ -30,15 +30,15 @@
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
 
-#ifndef CORE_RUNTIME_BINDINGS_COMMON_EVENT_MESSAGE_EVENT_H_
-#define CORE_RUNTIME_BINDINGS_COMMON_EVENT_MESSAGE_EVENT_H_
+#ifndef CORE_RUNTIME_COMMON_BINDINGS_EVENT_MESSAGE_EVENT_H_
+#define CORE_RUNTIME_COMMON_BINDINGS_EVENT_MESSAGE_EVENT_H_
 
 #include <memory>
 #include <string>
 
 #include "core/event/event.h"
 #include "core/public/pub_value.h"
-#include "core/runtime/bindings/common/event/context_proxy.h"
+#include "core/runtime/common/bindings/event/context_proxy.h"
 
 namespace lynx {
 namespace runtime {
@@ -88,4 +88,4 @@ class MessageEvent : public event::Event {
 }  // namespace runtime
 }  // namespace lynx
 
-#endif  // CORE_RUNTIME_BINDINGS_COMMON_EVENT_MESSAGE_EVENT_H_
+#endif  // CORE_RUNTIME_COMMON_BINDINGS_EVENT_MESSAGE_EVENT_H_

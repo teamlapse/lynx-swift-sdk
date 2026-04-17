@@ -6,6 +6,7 @@
 #define CORE_RENDERER_DOM_ELEMENT_H_
 
 #include <array>
+#include <list>
 #include <map>
 #include <memory>
 #include <string>
@@ -15,6 +16,7 @@
 #include <vector>
 
 #include "base/include/auto_create_optional.h"
+#include "base/include/closure.h"
 #include "base/include/no_destructor.h"
 #include "base/include/value/ref_type.h"
 #include "base/include/value/table.h"
@@ -29,15 +31,18 @@
 #include "core/renderer/css/css_style_sheet_manager.h"
 #include "core/renderer/css/css_variable_handler.h"
 #include "core/renderer/css/dynamic_css_styles_manager.h"
+#include "core/renderer/css/ng/invalidation/invalidation_set.h"
 #include "core/renderer/dom/attribute_holder.h"
 #include "core/renderer/dom/base_element_container.h"
 #include "core/renderer/dom/style_resolver.h"
 #include "core/renderer/events/events.h"
 #include "core/renderer/events/gesture.h"
+#include "core/renderer/simple_styling/style_object.h"
 #include "core/renderer/starlight/types/layout_result.h"
 #include "core/renderer/ui_wrapper/layout/layout_node.h"
 #include "core/renderer/ui_wrapper/painting/catalyzer.h"
 #include "core/renderer/ui_wrapper/painting/painting_context.h"
+#include "core/renderer/utils/base/tasm_constants.h"
 
 namespace lynx {
 namespace tasm {
@@ -48,6 +53,12 @@ class ElementContainer;
 class HierarchyObserver;
 class ListNode;
 class Fragment;
+class CSSFragmentDecorator;
+struct LayoutBundle;
+class PseudoElement;
+class ListItemSchedulerAdapter;
+class ElementContextDelegate;
+class PlatformLayoutFunctionWrapper;
 
 using ElementChildrenArray =
     base::InlineVector<Element*, kChildrenInlineVectorSize>;
@@ -104,11 +115,6 @@ class InspectorAttribute {
   std::unique_ptr<Element> style_value_;
 };
 
-struct BindEventCatch {
-  int capture_catch{0};
-  int bubble_catch{0};
-};
-
 class Element : public lepus::RefCounted,
                 public fml::EnableWeakFromThis<Element>,
                 public event::EventTarget {
@@ -127,6 +133,64 @@ class Element : public lepus::RefCounted,
     kDetached,
   };
 
+  enum class Action : uint8_t {
+    kCreateAct = 0,
+    kDestroyAct,
+    kInsertChildAct,
+    kRemoveChildAct,
+    kMoveAct,
+    kUpdatePropsAct,
+    kRemoveIntergenerationAct,
+  };
+
+  struct ActionParam {
+    ActionParam(Action type, Element* parent, const fml::RefPtr<Element>& child,
+                int from, Element* ref_node, bool is_fixed = false,
+                bool has_z_index = false)
+        : type_(type),
+          parent_(parent),
+          child_(child),
+          index_(from),
+          ref_node_(ref_node),
+          is_fixed_(is_fixed),
+          has_z_index_(has_z_index) {}
+    Action type_;
+    Element* parent_;
+    fml::RefPtr<Element> child_;
+    int index_;
+    Element* ref_node_;
+    bool is_fixed_;
+    bool has_z_index_;
+  };
+
+  static const uint32_t kDirtyCreated;
+  static const uint32_t kDirtyTree;
+  static const uint32_t kDirtyStyle;
+  static const uint32_t kDirtyAttr;
+  static const uint32_t kDirtyForceUpdate;
+  static const uint32_t kDirtyEvent;
+  static const uint32_t kDirtyReAttachContainer;
+  static const uint32_t kDirtyPropagateInherited;
+  static const uint32_t kDirtyDataset;
+  static const uint32_t kDirtyGesture;
+  static const uint32_t kDirtyFontSize;
+  static const uint32_t kDirtyRefreshCSSVariables;
+  static constexpr uint32_t kDirtyStyleObjects = 0x01 << 13;
+  static constexpr uint32_t kDirtyCloned = 0x01 << 14;
+
+  enum class AsyncResolveStatus : uint8_t {
+    kCreated = 0,
+    kPrepareRequested,
+    kPrepareTriggered,
+    kPreparing,
+    kSyncResolving,
+    kResolving,
+    kResolved,
+    kUpdated,
+  };
+
+  constexpr static const char* kFiberParallelPrepareMode = "ParallelPrepare";
+
   static const uint32_t kFlagGreedyParallel = 0x01 << 0;
   static const uint32_t kFlagLevelOrderParallel = 0x01 << 1;
 
@@ -141,9 +205,6 @@ class Element : public lepus::RefCounted,
   }
   AttributeHolder* data_model() const { return data_model_.get(); };
 
-  virtual bool is_radon_element() const { return false; }
-  virtual bool is_fiber_element() const { return false; }
-
   bool is_fixed() { return is_fixed_; }
   // TODO(ZHOUZHITAO): Move parallel_flush_ flag from element to
   // ParallelResolver
@@ -155,6 +216,12 @@ class Element : public lepus::RefCounted,
   void ResetParallelFlushFlag() { parallel_flush_ = 0; }
 
   int32_t impl_id() const { return id_; }
+
+  uint32_t GlobalInsertionOrder() const { return global_insertion_order_; }
+  void UpdateGlobalInsertionOrder();
+  void ResetGlobalInsertionOrder() {
+    global_insertion_order_ = kInitialGlobalInsertionOrder;
+  }
 
   void SetNodeIndex(uint32_t node_index) { node_index_ = node_index; }
   uint32_t NodeIndex() const { return node_index_; }
@@ -180,7 +247,7 @@ class Element : public lepus::RefCounted,
   virtual Element* last_child() const { return nullptr; }
   virtual Element* next_render_sibling() { return nullptr; }
 
-  virtual ~Element() = default;
+  virtual ~Element();
 
   // For style op
   LYNX_EXPORT_FOR_DEVTOOL virtual void ConsumeStyle(
@@ -265,18 +332,32 @@ class Element : public lepus::RefCounted,
   virtual const std::string& ParentComponentEntryName() const = 0;
 
   inline bool IsLayoutOnly() { return is_layout_only_; }
+  // Check if this element is a fixed element using the new fixed positioning
+  // system
   bool IsNewFixed() const;
+  // Get whether the new fixed positioning system is enabled
   bool GetEnableFixedNew() const;
+  // Check if this element is a fixed element using the unified fixed behavior
+  bool IsFixedUnified() const;
+  // Get whether the unified fixed behavior is enabled, to be removed when
+  // enable_unify_fixed_behavior is default enabled
+  bool IsFixedUnifiedEnabled() const;
+  // Check if either new fixed or unified fixed behavior is enabled, to be
+  // removed when enable_unify_fixed_behavior is default enabled
+  bool IsFixedNewOrUnifiedEnabled() const;
+  // Check if this element uses either new fixed positioning or
+  // unified fixed
+  bool IsFixedNewOrUnified() const;
+  // Check if this element uses unified fixed behavior but not new fixed
+  // positioning
+  bool IsFixedUnifiedOnly() const;
+
   inline bool is_virtual() { return is_virtual_; }
-  virtual bool is_fixed_new() { return false; }
   LYNX_EXPORT_FOR_DEVTOOL virtual bool GetPageElementEnabled() { return false; }
   LYNX_EXPORT_FOR_DEVTOOL virtual bool GetRemoveCSSScopeEnabled() {
     return false;
   }
 
-  void SetArchType(ElementArchTypeEnum arch_type) { arch_type_ = arch_type; }
-
-  bool GetArchType() { return arch_type_; }
   bool IsRadonArch() const { return arch_type_ == RadonArch; }
   bool IsFiberArch() const { return arch_type_ == FiberArch; }
 
@@ -338,7 +419,6 @@ class Element : public lepus::RefCounted,
                                      PseudoState current_status) {}
 
   ContentData* content_data() const { return content_data_.get(); }
-  void SetContentData(ContentData* data) { content_data_.reset(data); }
 
   virtual void UpdateDynamicElementStyle(uint32_t style, bool force_update) = 0;
 
@@ -370,7 +450,10 @@ class Element : public lepus::RefCounted,
 
   bool IsCSSInlineVariablesEnabled() const;
 
-  BaseElementContainer* element_container() { return element_container_.get(); }
+  BaseElementContainer* element_container() const {
+    return element_container_.get();
+  }
+
   ElementContainer* element_container_impl();
   Fragment* fragment_impl();
 
@@ -402,6 +485,8 @@ class Element : public lepus::RefCounted,
 
   inline const auto& GlobalBindTarget() { return global_bind_target_set_; }
   virtual bool CanBeLayoutOnly() const = 0;
+
+  LYNX_EXPORT_FOR_DEVTOOL bool HasUIPrimitive() const;
 
   virtual void CheckHasInlineContainer(Element* parent);
 
@@ -501,7 +586,6 @@ class Element : public lepus::RefCounted,
   void CheckHasNonFlattenCSSProps(CSSPropertyID id);
   void CheckFixedSticky(CSSPropertyID id, const tasm::CSSValue& value);
 
-  void CheckBoxShadowOrOutline(CSSPropertyID id);
   bool DisableFlattenWithOpacity();
 
   inline starlight::ComputedCSSStyle* computed_css_style() {
@@ -538,13 +622,11 @@ class Element : public lepus::RefCounted,
     // currently, radon element do no need to such kind of check
   }
 
-  bool EnableLayoutInElementMode() const {
-    return enable_layout_in_element_mode_;
-  }
+  bool EnableLayoutInElementMode() const;
 
-  bool EnableFragmentLayerRender() const {
-    return enable_fragment_layer_render_;
-  }
+  bool UsingTextService() const;
+
+  bool EnableFragmentLayerRender() const;
 
   virtual void WillResetCSSValue(CSSPropertyID& id) {}
 
@@ -572,7 +654,7 @@ class Element : public lepus::RefCounted,
 
   virtual void FlushProps() = 0;
 
-  void set_will_destroy(bool destroy) { will_destroy_ = destroy; }
+  virtual void set_will_destroy(bool destroy) { will_destroy_ = destroy; }
 
   bool will_destroy() { return will_destroy_; }
 
@@ -642,8 +724,7 @@ class Element : public lepus::RefCounted,
   // Whether list uses platform component.
   virtual bool DisableListPlatformImplementation() const { return false; }
 
-  virtual bool NeedFullFlushPath(
-      const std::pair<CSSPropertyID, tasm::CSSValue>& style) = 0;
+  virtual bool NeedFullFlushPath(CSSPropertyID id, const CSSValue& value) = 0;
 
   virtual bool is_view() const { return false; }
 
@@ -678,7 +759,6 @@ class Element : public lepus::RefCounted,
 
   // When list component finishes all props update
   virtual void PropsUpdateFinish() {}
-  bool HasPropsToBeFlush() const { return prop_bundle_ != nullptr; }
 
   void PushToBundle(CSSPropertyID id);
 
@@ -701,21 +781,20 @@ class Element : public lepus::RefCounted,
 
   void HandleCSSVariables(StyleMap& styles);
 
-  void ResolvePlaceHolder();
-
   // Callback before style resolving. Return false to skip style resolving.
   virtual bool WillResolveStyle(StyleMap& merged_styles,
                                 CSSVariableMap* changed_css_vars) {
     return true;
   }
-  virtual void DidResolveStyle(StyleMap& merged_styles) {}
 
   // Style resolver will firstly call `CountInlineStyles` to get count
   // of inline styles to be merged. Then it will merge styles from CSS
   // selectors and finally calls `MergeInlineStyles` to merge the inline
   // styles.
   virtual size_t CountInlineStyles() = 0;
-  virtual void MergeInlineStyles(StyleMap& merged_styles) = 0;
+
+  // Returns true if CSS variables were merged and need to be resolved.
+  virtual bool MergeInlineStyles(StyleMap& merged_styles) = 0;
 
   virtual int32_t GetMemoryUsage() const { return sizeof(*this); }
 
@@ -728,7 +807,11 @@ class Element : public lepus::RefCounted,
 
   EventTarget* GetParentTarget() override { return parent_; }
 
-  bool IsEventPathCatch() override;
+  bool IsEventPathCatch(event::EventTarget* target,
+                        event::Event* event) override;
+
+  bool IsEventPathSkip(event::EventTarget* target,
+                       event::Event* event) override;
 
   virtual void HandleGlobalEvent(fml::RefPtr<event::Event> event) override;
 
@@ -769,6 +852,12 @@ class Element : public lepus::RefCounted,
   base::String tag_;
 
   int32_t id_;
+  /**
+   * A globally unique sequential identifier representing
+   * the chronological position at which this element was
+   * inserted into the DOM tree relative to all other elements.
+   */
+  uint32_t global_insertion_order_{kInitialGlobalInsertionOrder};
   uint32_t node_index_{0};
 
   constexpr const static int32_t kLayoutNodeTypeNotInit = -1;
@@ -850,9 +939,6 @@ class Element : public lepus::RefCounted,
   bool enable_extended_layout_only_opt_{true};
   bool enable_component_layout_only_{true};
 
-  bool enable_layout_in_element_mode_{false};
-  bool enable_fragment_layer_render_{false};
-
   /**
    StyleResolver has no member variables and its size is 1 byte. Put it here
    along with booleans to minimize size of Element.
@@ -919,6 +1005,102 @@ class Element : public lepus::RefCounted,
   // for devtool
   std::unique_ptr<InspectorAttribute> inspector_attribute_;
 
+  std::unique_ptr<PlatformLayoutFunctionWrapper> customized_layout_node_;
+
+  base::InlineVector<fml::RefPtr<Element>, kChildrenInlineVectorSize>
+      scoped_children_;
+  base::InlineVector<fml::RefPtr<Element>, kChildrenInlineVectorSize>
+      logical_children_;
+  base::auto_create_optional<base::InlineVector<fml::RefPtr<Element>, 2>>
+      scoped_virtual_children_;
+  Element* virtual_parent_{nullptr};
+
+  Element* render_parent_{nullptr};
+  Element* last_render_child_{nullptr};
+  Element* first_render_child_{nullptr};
+  Element* previous_render_sibling_{nullptr};
+  Element* next_render_sibling_{nullptr};
+  css::InvalidationLists invalidation_lists_;
+
+  int64_t parent_component_unique_id_{-1};
+  mutable Element* parent_component_element_{nullptr};
+  mutable Element* render_root_element_{nullptr};
+  Element* enclosing_none_wrapper_{nullptr};
+
+  std::shared_ptr<CSSStyleSheetManager> css_style_sheet_manager_;
+  std::unique_ptr<CSSFragmentDecorator> style_sheet_;
+
+  uint32_t dirty_{0};
+  uint32_t wrapper_element_count_{0};
+
+  int32_t css_id_{kInvalidCssId};
+
+  DynamicCSSStylesManager::StyleUpdateFlags dynamic_style_flags_{0};
+
+  AsyncResolveStatus resolve_status_{AsyncResolveStatus::kCreated};
+
+  bool need_handle_fixed_{false};
+  bool has_extreme_parsed_styles_{false};
+  bool only_selector_extreme_parsed_styles_{false};
+  bool children_propagate_inherited_styles_flag_{false};
+  bool attached_to_layout_parent_{false};
+  bool can_be_layout_only_{false};
+  bool has_to_store_insert_remove_actions_{false};
+  bool has_font_size_{false};
+  bool is_template_{false};
+  bool has_transition_props_{false};
+
+  bool flush_required_{true};
+  bool is_first_created_{true};
+  bool is_async_flush_root_{false};
+
+  base::String full_raw_inline_style_;
+  StyleMap parsed_styles_map_;
+  base::auto_create_optional<StyleMap> styles_from_attributes_;
+  base::auto_create_optional<RawLepusStyleMap> current_raw_inline_styles_;
+  base::auto_create_optional<StyleMap> extreme_parsed_styles_;
+  base::auto_create_optional<StyleMap> inherited_styles_;
+  base::auto_create_optional<StyleMap> updated_inherited_styles_;
+  base::auto_create_optional<base::Vector<tasm::CSSPropertyID>>
+      reset_inherited_ids_;
+
+  CustomPropertiesMapRef custom_properties_;
+
+  base::auto_create_optional<
+      base::LinearFlatMap<tasm::CSSPropertyID, std::pair<CSSValue, IsLogic>>>
+      pending_updated_direction_related_styles_;
+
+  base::Vector<ActionParam> action_param_list_;
+
+  AttrUMap updated_attr_map_;
+  base::auto_create_optional<BuiltinAttrMap> builtin_attr_map_;
+  base::auto_create_optional<base::Vector<base::String>> reset_attr_vec_;
+
+  fml::RefPtr<lepus::Dictionary> config_;
+
+  base::auto_create_optional<std::list<base::closure>> parallel_reduce_tasks_;
+  base::auto_create_optional<std::list<base::closure>>
+      parallel_before_flush_action_tasks_;
+
+  std::unique_ptr<LayoutBundle> layout_bundle_;
+
+  base::String part_id_;
+
+  base::auto_create_optional<
+      base::LinearFlatMap<PseudoState, std::unique_ptr<PseudoElement>>>
+      pseudo_elements_;
+
+  std::unique_ptr<ListItemSchedulerAdapter> scheduler_adapter_;
+
+  std::unique_ptr<style::StyleObject*, style::StyleObjectArrayDeleter>
+      style_objects_{nullptr};
+  std::unique_ptr<style::StyleObject*, style::StyleObjectArrayDeleter>
+      last_style_objects_{nullptr};
+
+  ElementContextDelegate* element_context_delegate_{nullptr};
+
+  std::unique_ptr<SLNode> sl_node_{nullptr};
+
  private:
   // Element state, used to identify whether the current Element is on the root
   // Dom tree. When an Element is constructed, it is definitely not on the root
@@ -928,6 +1110,9 @@ class Element : public lepus::RefCounted,
   bool WriteRenderStyleToBundle(tasm::CSSPropertyID id,
                                 const tasm::CSSValue& value);
   void DispatchBundleToPaintingNode(fml::RefPtr<PropBundle> bundle);
+
+  CSSKeyframesToken* GetSimpleStyleKeyframesToken(
+      const base::String& animation_name);
 };
 
 }  // namespace tasm

@@ -21,6 +21,7 @@ let package = Package(
         .library(name: "BaseDevtool", targets: ["BaseDevtool"]),
         .library(name: "DebugRouter", targets: ["DebugRouter"]),
         .library(name: "SocketRocket", targets: ["SocketRocket"]),
+        .library(name: "ServalSVG", targets: ["ServalSVG"]),
     ],
     targets: [
         .binaryTarget(name: "Lynx", path: "XCFrameworks/Lynx.xcframework"),
@@ -33,5 +34,6 @@ let package = Package(
         .binaryTarget(name: "BaseDevtool", path: "XCFrameworks/BaseDevtool.xcframework"),
         .binaryTarget(name: "DebugRouter", path: "XCFrameworks/DebugRouter.xcframework"),
         .binaryTarget(name: "SocketRocket", path: "XCFrameworks/SocketRocket.xcframework"),
+        .binaryTarget(name: "ServalSVG", path: "XCFrameworks/ServalSVG.xcframework"),
     ]
 )

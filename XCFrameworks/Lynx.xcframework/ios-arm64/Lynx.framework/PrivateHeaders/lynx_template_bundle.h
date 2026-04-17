@@ -19,9 +19,9 @@
 #include "core/renderer/dom/element_bundle.h"
 #include "core/renderer/template_themed.h"
 #include "core/renderer/utils/base/element_template_info.h"
-#include "core/runtime/piper/js/js_bundle.h"
-#include "core/runtime/vm/lepus/context_pool.h"
-#include "core/runtime/vm/lepus/function.h"
+#include "core/runtime/js/js_bundle.h"
+#include "core/runtime/lepus/context_pool.h"
+#include "core/runtime/lepus/function.h"
 #include "core/template_bundle/template_codec/binary_decoder/page_config.h"
 #include "core/template_bundle/template_codec/binary_decoder/parallel_parse_task_scheduler.h"
 #include "core/template_bundle/template_codec/compile_options.h"
@@ -168,6 +168,8 @@ class LynxTemplateBundle final {
   const std::shared_ptr<lynx::tasm::PageConfig> &GetPageConfig() {
     return page_configs_;
   };
+
+  const CompileOptions &GetCompileOptions() const { return compile_options_; }
 
  private:
   void EnsureParseTaskScheduler();

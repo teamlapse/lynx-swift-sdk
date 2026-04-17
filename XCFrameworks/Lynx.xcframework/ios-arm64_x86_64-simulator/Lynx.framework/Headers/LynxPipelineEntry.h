@@ -4,6 +4,9 @@
 #import <Foundation/Foundation.h>
 #import "LynxPerformanceEntry.h"
 #import "LynxHostPlatformTiming.h"
+#import "LynxPerformanceMetric.h"
+
+NS_ASSUME_NONNULL_BEGIN
 
 @interface LynxPipelineEntry : LynxPerformanceEntry
 @property(nonatomic, strong) NSString* identifier;
@@ -22,5 +25,10 @@
 @property(nonatomic, strong) NSNumber* paintEnd;
 @property(nonatomic, strong) NSDictionary* frameworkRenderingTiming;
 @property(nonatomic, strong) LynxHostPlatformTiming* hostPlatformTiming;
+@property(nonatomic, strong, nullable) LynxPerformanceMetric* actualFmp;
+@property(nonatomic, strong, nullable) LynxPerformanceMetric* lynxActualFmp;
+@property(nonatomic, strong, nullable) LynxPerformanceMetric* totalActualFmp;
 - (instancetype)initWithDictionary:(NSDictionary*)dictionary;
 @end
+
+NS_ASSUME_NONNULL_END

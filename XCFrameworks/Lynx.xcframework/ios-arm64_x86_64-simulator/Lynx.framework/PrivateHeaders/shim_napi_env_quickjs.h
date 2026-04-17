@@ -2,8 +2,8 @@
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
 
-#ifndef CORE_RUNTIME_BINDINGS_NAPI_SHIM_SHIM_NAPI_ENV_QUICKJS_H_
-#define CORE_RUNTIME_BINDINGS_NAPI_SHIM_SHIM_NAPI_ENV_QUICKJS_H_
+#ifndef CORE_RUNTIME_COMMON_NAPI_SHIM_SHIM_NAPI_ENV_QUICKJS_H_
+#define CORE_RUNTIME_COMMON_NAPI_SHIM_SHIM_NAPI_ENV_QUICKJS_H_
 
 #ifdef OS_IOS
 #include <napi_env_quickjs.h>
@@ -11,4 +11,4 @@
 #include "third_party/napi/include/napi_env_quickjs.h"
 #endif
 
-#endif  // CORE_RUNTIME_BINDINGS_NAPI_SHIM_SHIM_NAPI_ENV_QUICKJS_H_
+#endif  // CORE_RUNTIME_COMMON_NAPI_SHIM_SHIM_NAPI_ENV_QUICKJS_H_

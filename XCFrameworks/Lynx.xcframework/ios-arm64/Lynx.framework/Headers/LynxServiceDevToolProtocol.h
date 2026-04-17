@@ -11,7 +11,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class LynxView;
-
+@class LynxConfig;
 @protocol LynxLogBoxProtocol;
 @protocol LynxBaseInspectorOwner;
 @protocol LynxBasePerfMonitor;
@@ -38,7 +38,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (Class<LynxContextModule>)devtoolSetModuleClass;
 
-- (Class<LynxContextModule>)devtoolWebSocketModuleClass;
+- (Class<LynxContextModule>)lynxWebSocketModuleClass;
 
 - (Class<LynxContextModule>)devtoolTrailModuleClass;
 
@@ -48,8 +48,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)devtoolEnvSharedInstance;
 
-- (void)devtoolEnvPrepareWithConfig:(LynxConfig *)lynxConfig;
-
 - (void)devtoolEnvSetValue:(BOOL)value forKey:(NSString *)key;
 
 - (BOOL)devtoolEnvGetValue:(NSString *)key withDefaultValue:(BOOL)value;
@@ -57,6 +55,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)devtoolEnvSet:(NSSet *)newGroupValues forGroup:(NSString *)groupKey;
 
 - (NSSet *)devtoolEnvGetGroup:(NSString *)groupKey;
+
+- (void)enableAllSessions;
 
 @end
 

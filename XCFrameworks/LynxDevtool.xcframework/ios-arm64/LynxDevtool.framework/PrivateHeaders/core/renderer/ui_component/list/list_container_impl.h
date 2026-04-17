@@ -53,6 +53,9 @@ class ListContainerImpl : public ListContainerDelegateInternal {
   void AddEvent(const base::String& name) override;
   void ClearEvents() override;
   void ResolveListAxisGap(CSSPropertyID id, float gap) override;
+  void SetEnableBatchRender(bool enable_batch_render) override {
+    enable_batch_render_ = enable_batch_render;
+  }
   int GetDataCount() const;
   ItemHolder* GetItemHolderForIndex(int index);
   void FlushPatching();
@@ -107,10 +110,7 @@ class ListContainerImpl : public ListContainerDelegateInternal {
   bool ShouldGenerateDebugInfo(list::ListDebugInfoLevel targetLevel);
   void RecordVisibleItemIfNeeded(bool is_layout_before);
   bool has_valid_diff() const { return has_valid_diff_; }
-  bool enable_batch_render() const {
-    return list_option_.batch_render_strategy !=
-           list::BatchRenderStrategy::kDefault;
-  }
+  bool enable_batch_render() const { return enable_batch_render_; }
   bool enable_insert_platform_view_operation() const {
     return enable_insert_platform_view_operation_;
   }
@@ -122,6 +122,14 @@ class ListContainerImpl : public ListContainerDelegateInternal {
   void SendDebugEvent(const fml::RefPtr<lepus::Dictionary>& detail) {
     list_event_manager_->SendDebugEvent(detail);
   }
+  list::SearchRefAnchorStrategy search_ref_anchor_strategy() const {
+    return search_ref_anchor_strategy_;
+  }
+  bool ShouldSearchRefAnchor() const {
+    return search_ref_anchor_strategy_ ==
+               list::SearchRefAnchorStrategy::kToStart ||
+           search_ref_anchor_strategy_ == list::SearchRefAnchorStrategy::kToEnd;
+  }
   void MarkShouldFlushFinishLayout(bool has_layout) {
     should_flush_finish_layout_ |= has_layout;
   }
@@ -130,10 +138,6 @@ class ListContainerImpl : public ListContainerDelegateInternal {
   }
 
   ListContainerAnimationManager* AnimationManager() const;
-
-  void UpdateBatchRenderStrategy(list::BatchRenderStrategy strategy) override;
-
-  list::BatchRenderStrategy GetBatchRenderStrategy() override;
 
  protected:
   // Currently, the list container does not copy any member variables and is an
@@ -152,6 +156,8 @@ class ListContainerImpl : public ListContainerDelegateInternal {
   bool recycle_available_item_before_layout_{false};
   bool sticky_enabled_{false};
   bool recycle_sticky_item_{true};
+  list::SearchRefAnchorStrategy search_ref_anchor_strategy_{
+      list::SearchRefAnchorStrategy::kNone};
   int sticky_buffer_count_{list::kInvalidItemCount};
   float sticky_offset_{0.f};
   int intercept_depth_{0};
@@ -176,19 +182,12 @@ class ListContainerImpl : public ListContainerDelegateInternal {
   bool need_update_item_holders_{false};
   bool enable_preload_section_{false};
   int layout_id_{-1};
+  bool enable_batch_render_{false};
   bool should_request_state_restore_{false};
   bool has_valid_diff_{false};
   bool update_animation_{false};
-
   list::ListAdapterDiffResult animation_diff_result_{
       list::ListAdapterDiffResult::kNone};
-
-  struct ListOption {
-    list::BatchRenderStrategy batch_render_strategy{
-        list::BatchRenderStrategy::kDefault};
-  };
-
-  ListOption list_option_;
 
  public:
   bool need_preload_section_on_next_frame_{false};

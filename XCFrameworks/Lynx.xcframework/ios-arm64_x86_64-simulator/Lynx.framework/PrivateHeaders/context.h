@@ -1,8 +1,8 @@
 // Copyright 2019 The Lynx Authors. All rights reserved.
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
-#ifndef CORE_RUNTIME_VM_LEPUS_CONTEXT_H_
-#define CORE_RUNTIME_VM_LEPUS_CONTEXT_H_
+#ifndef CORE_RUNTIME_LEPUS_CONTEXT_H_
+#define CORE_RUNTIME_LEPUS_CONTEXT_H_
 
 #include <memory>
 #include <mutex>
@@ -22,17 +22,13 @@
 #include "core/inspector/lepus_inspector_manager.h"
 #include "core/inspector/observer/inspector_lepus_observer.h"
 #include "core/public/page_options.h"
-#include "core/runtime/bindings/lepus/renderer.h"
-#include "core/runtime/vm/lepus/lepus_context_cell.h"
-#include "core/runtime/vm/lepus/lepus_global.h"
+#include "core/runtime/lepus/bindings/renderer.h"
+#include "core/runtime/lepus/lepus_context_cell.h"
+#include "core/runtime/lepus/lepus_global.h"
 #include "core/template_bundle/template_codec/binary_decoder/page_config.h"
 #include "core/template_bundle/template_codec/compile_options.h"
 
-struct LEPUSRuntime;
-struct LEPUSContext;
-
 namespace lynx {
-
 namespace tasm {
 class AnimationFrameManager;
 class LepusCallbackManager;
@@ -41,21 +37,16 @@ class LepusCallbackManager;
 namespace lepus {
 class ContextBundle;
 
-class LEPUSRuntimeData {
- public:
-  LEPUSRuntimeData(bool disable_tracing_gc, int runtime_mode);
-  ~LEPUSRuntimeData();
-
-  LEPUSRuntime* runtime_;
-  LEPUSContext* lepus_context_;
-  // "length" cache
-  LEPUSAtom length_atom_;
-};
-
 enum ContextType {
   VMContextType,       // Run low level version lepus with VmContext
   LepusNGContextType,  // Run lepusNG with qucikjs code
-  LepusContextType     // Run low level version lepus with LepusNG
+};
+
+struct RenderBindingFunction {
+  const char* name;
+  CFunction function;
+  bool for_lepus = true;
+  bool for_lepusng = true;
 };
 
 #define LEPUS_DEFAULT_CONTEXT_NAME "__Card__"
@@ -107,9 +98,18 @@ class Context {
   // entry point.
   virtual bool Execute() = 0;
 
+  bool TryExecute();
+  bool HasPreExecuteSuccess();
+
   virtual void UpdateGCTiming(bool is_start){};
 
   virtual void TriggerVmGC(){};
+
+  virtual void RegisterGlobalFunction(const RenderBindingFunction* funcs,
+                                      size_t size) = 0;
+  virtual void RegisterObjectFunction(lepus::Value& obj,
+                                      const RenderBindingFunction* funcs,
+                                      size_t size) = 0;
 
   bool UpdateTopLevelVariable(const std::string& name, const Value& val);
   virtual bool UpdateTopLevelVariableByPath(base::Vector<std::string>& path,
@@ -158,13 +158,10 @@ class Context {
     return CallClosureArgs(closure, p_args, n_args);
   }
 
-  virtual std::unique_ptr<Value> GetTopLevelVariable(
-      bool ignore_callable = false) = 0;
+  virtual lepus::Value GetTopLevelVariable(bool ignore_callable = false) = 0;
   virtual bool GetTopLevelVariableByName(const base::String& name,
                                          lepus::Value* ret) = 0;
 
-  virtual long GetParamsSize() = 0;
-  virtual Value* GetParam(long index) = 0;
   virtual void SetGlobalData(const base::String& name, Value value) = 0;
   /**
    * This value will overwrite the origin value
@@ -204,23 +201,9 @@ class Context {
   // check context type
   bool IsVMContext() const { return type_ == VMContextType; }
   bool IsLepusNGContext() const { return type_ == LepusNGContextType; }
-  bool IsLepusContext() const { return type_ == LepusContextType; }
-  virtual LEPUSContext* context() const { return nullptr; }
-  virtual LEPUSValue GetTopLevelFunction() const { return LEPUS_UNDEFINED; }
-
-  static LEPUSLepusRefCallbacks GetLepusRefCall();
-
-  static CellManager& GetContextCells();
-  static ContextCell* RegisterContextCell(lepus::QuickContext* qctx);
-
-  static inline ContextCell* GetContextCellFromCtx(LEPUSContext* ctx) {
-    return ctx ? reinterpret_cast<ContextCell*>(LEPUS_GetContextOpaque(ctx))
-               : nullptr;
-  }
 
   void EnsureLynx();
   void SetPropertyToLynx(const base::String& key, const lepus::Value& value);
-  virtual void RegisterMethodToLynx() {}
 
   void ReportError(
       const std::string& exception_info,
@@ -249,7 +232,6 @@ class Context {
   virtual bool DeSerialize(const ContextBundle&, bool, Value* ret,
                            const char* file_name = nullptr) = 0;
 
-  virtual void RegisterCtxBuiltin(const tasm::ArchOption&) = 0;
   virtual void ApplyConfig(const std::shared_ptr<tasm::PageConfig>&,
                            const tasm::CompileOptions&) = 0;
 
@@ -264,7 +246,7 @@ class Context {
   // deleted.
   virtual lepus::Value GetCurrentThis(lepus::Value* argv, int32_t offset) {
     return lepus::Value();
-  }
+  };
 
   virtual void SetDebugInfoURL(const std::string& url,
                                const std::string& file_name);
@@ -313,6 +295,7 @@ class Context {
   std::string sdk_version_{"null"};
   // debugger source code
   std::string debug_source_;
+  bool has_pre_execute_success_{false};
 
   std::unique_ptr<LepusInspectorManager> inspector_manager_;
 
@@ -331,4 +314,4 @@ class ContextBundle {
 }  // namespace lepus
 }  // namespace lynx
 
-#endif  // CORE_RUNTIME_VM_LEPUS_CONTEXT_H_
+#endif  // CORE_RUNTIME_LEPUS_CONTEXT_H_

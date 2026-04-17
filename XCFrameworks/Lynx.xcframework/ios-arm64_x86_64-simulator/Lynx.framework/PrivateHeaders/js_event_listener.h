@@ -2,16 +2,16 @@
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
 
-#ifndef CORE_RUNTIME_BINDINGS_JSI_EVENT_JS_EVENT_LISTENER_H_
-#define CORE_RUNTIME_BINDINGS_JSI_EVENT_JS_EVENT_LISTENER_H_
+#ifndef CORE_RUNTIME_JS_BINDINGS_EVENT_JS_EVENT_LISTENER_H_
+#define CORE_RUNTIME_JS_BINDINGS_EVENT_JS_EVENT_LISTENER_H_
 
 #include <memory>
 
 #include "base/include/value/base_value.h"
 #include "core/event/event_listener.h"
-#include "core/runtime/bindings/common/event/context_proxy.h"
-#include "core/runtime/bindings/jsi/js_app.h"
-#include "core/runtime/jsi/jsi.h"
+#include "core/runtime/common/bindings/event/context_proxy.h"
+#include "core/runtime/js/bindings/js_app.h"
+#include "core/runtime/js/jsi/jsi.h"
 
 namespace lynx {
 namespace piper {
@@ -39,4 +39,4 @@ class JSClosureEventListener : public event::EventListener {
 }  // namespace piper
 }  // namespace lynx
 
-#endif  // CORE_RUNTIME_BINDINGS_JSI_EVENT_JS_EVENT_LISTENER_H_
+#endif  // CORE_RUNTIME_JS_BINDINGS_EVENT_JS_EVENT_LISTENER_H_

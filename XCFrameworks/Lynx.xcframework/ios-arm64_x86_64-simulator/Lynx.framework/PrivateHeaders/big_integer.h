@@ -4,8 +4,8 @@
 /*
  * defined BigInteger and related operator, such as "+ - * / %" and so on.
  */
-#ifndef CORE_RUNTIME_BINDINGS_JSI_BIG_INT_BIG_INTEGER_H_
-#define CORE_RUNTIME_BINDINGS_JSI_BIG_INT_BIG_INTEGER_H_
+#ifndef CORE_RUNTIME_JS_BINDINGS_BIG_INT_BIG_INTEGER_H_
+#define CORE_RUNTIME_JS_BINDINGS_BIG_INT_BIG_INTEGER_H_
 
 #include <climits>
 #include <iomanip>
@@ -789,4 +789,4 @@ inline std::ostream& operator<<(std::ostream& s, const BigInteger& n) {
 
 }  // namespace piper
 }  // namespace lynx
-#endif  // CORE_RUNTIME_BINDINGS_JSI_BIG_INT_BIG_INTEGER_H_
+#endif  // CORE_RUNTIME_JS_BINDINGS_BIG_INT_BIG_INTEGER_H_

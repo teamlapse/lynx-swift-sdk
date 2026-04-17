@@ -8,6 +8,7 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 #include "base/include/value/base_value.h"
 #include "base/include/vector.h"
@@ -18,6 +19,7 @@
 #include "core/renderer/css/css_variable_handler.h"
 #include "core/renderer/css/dynamic_css_styles_manager.h"
 #include "core/renderer/dom/attribute_holder.h"
+#include "core/runtime/lepus/bindings/style/shared_css_fragment_wrapper.h"
 
 namespace lynx {
 namespace style {
@@ -26,7 +28,6 @@ class StyleObject;
 }  // namespace style
 namespace tasm {
 class FiberElement;
-class RadonElement;
 class ElementManager;
 
 class StyleResolver {
@@ -37,15 +38,16 @@ class StyleResolver {
   using MatchedVector = base::InlineVector<T, kDefaultMatchedSize>;
 
   LYNX_EXPORT_FOR_DEVTOOL static MatchedVector<css::MatchedRule>
-  GetCSSMatchedRule(AttributeHolder* node, CSSFragment* style_sheet);
+  GetCSSMatchedRule(
+      AttributeHolder* node, CSSFragment* style_sheet,
+      const std::vector<fml::RefPtr<tasm::SharedCSSFragmentWrapper>>*
+          adopted_sheets = nullptr);
 
   void ResolveStyle(StyleMap& result, CSSFragment* fragment,
                     CSSVariableMap* changed_css_vars = nullptr);
   void HandleCSSVariables(StyleMap& styles);
 
   void HandlePseudoElement(CSSFragment* fragment);
-
-  void ResolvePlaceHolder();
   /**
    * @brief Resolves differences between an old and new list of style objects,
    *        applying changes to a target node.
@@ -75,8 +77,6 @@ class StyleResolver {
   void GetCSSStyleNew(AttributeHolder* node, CSSFragment* style_sheet);
 
   void GetCSSStyleForFiber(FiberElement* node, CSSFragment* style_sheet);
-
-  void GetCSSStyleCompatible(Element* element, CSSFragment* style_sheet);
 
   void DidCollectMatchedRules(AttributeHolder* holder, StyleMap& result,
                               CSSVariableMap* changed_css_vars,
@@ -124,8 +124,6 @@ class StyleResolver {
 
   const tasm::CSSParserConfigs& GetCSSParserConfigs();
 
-  void UpdateContentNode(const StyleMap& attrs, RadonElement* element);
-
   void ParsePlaceHolderTokens(PseudoPlaceHolderStyles& result,
                               const StyleMap& map);
 
@@ -136,10 +134,6 @@ class StyleResolver {
 
   InlineTokenVector ParsePseudoCSSTokens(AttributeHolder* node,
                                          const char* selector);
-
-  void GenerateContentData(const lepus::Value& value,
-                           const AttributeHolder* vnode,
-                           RadonElement* shadow_node);
 
   void ResolvePseudoElement(PseudoState state, CSSFragment* fragment,
                             FiberElement* fiber_element,

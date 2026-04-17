@@ -17,8 +17,8 @@
 #include "core/renderer/data/template_data.h"
 #include "core/renderer/tasm_runtime_bundle.h"
 #include "core/renderer/utils/base/element_template_info.h"
-#include "core/runtime/vm/lepus/lepus_global.h"
-#include "core/runtime/vm/lepus/vm_context.h"
+#include "core/runtime/lepus/lepus_global.h"
+#include "core/runtime/lepus/vm_context.h"
 #include "core/template_bundle/lynx_template_bundle.h"
 #include "core/template_bundle/template_codec/binary_decoder/lynx_binary_lazy_reader_delegate.h"
 #include "core/template_bundle/template_codec/binary_decoder/page_config.h"
@@ -210,6 +210,10 @@ class TemplateEntry : public VmContextHolder, public CSSStyleSheetDelegate {
     enable_reuse_load_script_exports_ = enable;
   }
 
+  void SetEnableFetchApiStandard(bool enable) {
+    enable_fetch_api_standard_ = enable;
+  }
+
   LynxBinaryLazyReaderDelegate* GetReader() { return reader_.get(); }
 
   TasmRuntimeBundle CreateTasmRuntimeBundle();
@@ -315,6 +319,7 @@ class TemplateEntry : public VmContextHolder, public CSSStyleSheetDelegate {
   bool enable_bind_icu_ = false;
   bool enable_microtask_promise_polyfill_{false};
   bool enable_reuse_load_script_exports_{false};
+  bool enable_fetch_api_standard_{false};
 #if ENABLE_LEPUSNG_WORKLET
   std::unique_ptr<lynx::piper::NapiEnvironment> napi_environment_;
 #endif

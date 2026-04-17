@@ -1,10 +1,10 @@
 // Copyright 2019 The Lynx Authors. All rights reserved.
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
-#ifndef CORE_RUNTIME_VM_LEPUS_VISITOR_H_
-#define CORE_RUNTIME_VM_LEPUS_VISITOR_H_
+#ifndef CORE_RUNTIME_LEPUS_VISITOR_H_
+#define CORE_RUNTIME_LEPUS_VISITOR_H_
 
-#include "core/runtime/vm/lepus/syntax_tree.h"
+#include "core/runtime/lepus/syntax_tree.h"
 
 namespace lynx {
 namespace lepus {
@@ -44,4 +44,4 @@ class Visitor {
 };
 }  // namespace lepus
 }  // namespace lynx
-#endif  // CORE_RUNTIME_VM_LEPUS_VISITOR_H_
+#endif  // CORE_RUNTIME_LEPUS_VISITOR_H_

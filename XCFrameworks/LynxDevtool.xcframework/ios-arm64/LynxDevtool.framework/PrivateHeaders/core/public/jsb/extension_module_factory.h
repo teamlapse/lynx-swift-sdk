@@ -13,10 +13,6 @@
 #include "core/public/jsb/lynx_extension_module.h"
 #include "core/public/jsb/native_module_factory.h"
 
-#ifdef USE_PRIMJS_NAPI
-#include "third_party/napi/include/primjs_napi_defines.h"
-#endif
-
 namespace lynx {
 namespace piper {
 
@@ -31,7 +27,7 @@ struct ModuleCreatorInfo {
 class ExtensionModuleFactory : public NativeModuleFactory {
  public:
   ExtensionModuleFactory()
-      : env_(nullptr),
+      : opaque_env_(nullptr),
         vsync_observer_(nullptr),
         task_runner_(nullptr),
         ui_delegate_(nullptr) {}
@@ -60,17 +56,17 @@ class ExtensionModuleFactory : public NativeModuleFactory {
 
   // Called on the BTS thread
   void OnRuntimeAttach(
-      napi_env env,
+      void* opaque_env,
       const std::shared_ptr<runtime::IVSyncObserver>& vsync_observer) {
     for (const auto& pair : module_map_) {
-      pair.second->SetRuntimeAttachedState(env, vsync_observer);
+      pair.second->SetRuntimeAttachedState(opaque_env, vsync_observer);
     }
-    env_ = env;
+    opaque_env_ = opaque_env;
     vsync_observer_ = vsync_observer;
   }
 
   // Called on the BTS thread
-  void OnRuntimeReady(napi_env env, napi_value lynx, const std::string& url) {
+  void OnRuntimeReady(void* env, void* lynx, const std::string& url) {
     for (const auto& pair : module_map_) {
       pair.second->SetRuntimeReadyState(env, lynx, url);
     }
@@ -113,7 +109,7 @@ class ExtensionModuleFactory : public NativeModuleFactory {
       module_map_;
   std::unordered_map<std::string, ModuleCreatorInfo> module_creators_;
   // The env_ Only accessible in BTS thread
-  napi_env env_;
+  void* opaque_env_;
   std::shared_ptr<runtime::IVSyncObserver> vsync_observer_;
   fml::RefPtr<fml::TaskRunner> task_runner_;
   tasm::UIDelegate* ui_delegate_;
@@ -121,9 +117,5 @@ class ExtensionModuleFactory : public NativeModuleFactory {
 
 }  // namespace piper
 }  // namespace lynx
-
-#ifdef USE_PRIMJS_NAPI
-#include "third_party/napi/include/primjs_napi_undefs.h"
-#endif
 
 #endif  // CORE_PUBLIC_JSB_EXTENSION_MODULE_FACTORY_H_

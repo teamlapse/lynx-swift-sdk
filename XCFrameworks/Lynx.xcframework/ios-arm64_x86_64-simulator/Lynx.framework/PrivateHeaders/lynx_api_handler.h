@@ -2,19 +2,18 @@
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
 
-#ifndef CORE_RUNTIME_PIPER_JS_LYNX_API_HANDLER_H_
-#define CORE_RUNTIME_PIPER_JS_LYNX_API_HANDLER_H_
+#ifndef CORE_RUNTIME_JS_LYNX_API_HANDLER_H_
+#define CORE_RUNTIME_JS_LYNX_API_HANDLER_H_
 
 #include <memory>
 #include <string>
 #include <vector>
 
-#include "base/include/linked_hash_map.h"
-#include "core/runtime/jsi/jsi.h"
+#include "base/include/vector.h"
+#include "core/runtime/js/jsi/jsi.h"
 
 namespace lynx {
 namespace runtime {
-class LynxRuntime;
 
 // run on js thread
 class AnimationFrameTaskHandler {
@@ -38,7 +37,7 @@ class AnimationFrameTaskHandler {
     piper::Function func_;
     bool cancelled_;
   };
-  using TaskMap = base::LinkedHashMap<int64_t, std::unique_ptr<FrameTask>>;
+  using TaskMap = base::LinearFlatMap<int64_t, std::unique_ptr<FrameTask>>;
   TaskMap& CurrentFrameTaskMap();
   TaskMap& NextFrameTaskMap();
   int64_t current_index_;
@@ -51,14 +50,11 @@ class AnimationFrameTaskHandler {
 // run on js thread
 class LynxApiHandler {
  public:
-  LynxApiHandler(LynxRuntime* rt);
+  LynxApiHandler() = default;
   ~LynxApiHandler() = default;
-
- private:
-  [[maybe_unused]] LynxRuntime* const rt_;
 };
 
 }  // namespace runtime
 }  // namespace lynx
 
-#endif  // CORE_RUNTIME_PIPER_JS_LYNX_API_HANDLER_H_
+#endif  // CORE_RUNTIME_JS_LYNX_API_HANDLER_H_

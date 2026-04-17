@@ -2,8 +2,8 @@
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
 
-#ifndef CORE_RUNTIME_BINDINGS_LEPUS_RESOURCE_RESPONSE_HANDLER_IN_LEPUS_H_
-#define CORE_RUNTIME_BINDINGS_LEPUS_RESOURCE_RESPONSE_HANDLER_IN_LEPUS_H_
+#ifndef CORE_RUNTIME_LEPUS_BINDINGS_RESOURCE_RESPONSE_HANDLER_IN_LEPUS_H_
+#define CORE_RUNTIME_LEPUS_BINDINGS_RESOURCE_RESPONSE_HANDLER_IN_LEPUS_H_
 
 #include <future>
 #include <memory>
@@ -12,8 +12,8 @@
 
 #include "base/include/fml/memory/weak_ptr.h"
 #include "base/include/value/base_value.h"
-#include "core/runtime/bindings/common/resource/response_handler_proxy.h"
-#include "core/runtime/vm/lepus/context.h"
+#include "core/runtime/common/bindings/resource/response_handler_proxy.h"
+#include "core/runtime/lepus/context.h"
 
 namespace lynx {
 namespace tasm {
@@ -48,4 +48,4 @@ class ResponseHandlerInLepus
 }  // namespace tasm
 }  // namespace lynx
 
-#endif  // CORE_RUNTIME_BINDINGS_LEPUS_RESOURCE_RESPONSE_HANDLER_IN_LEPUS_H_
+#endif  // CORE_RUNTIME_LEPUS_BINDINGS_RESOURCE_RESPONSE_HANDLER_IN_LEPUS_H_

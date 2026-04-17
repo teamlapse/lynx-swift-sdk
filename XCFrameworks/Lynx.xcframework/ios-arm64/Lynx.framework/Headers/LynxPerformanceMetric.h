@@ -3,6 +3,8 @@
 // LICENSE file in the root directory of this source tree.
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface LynxPerformanceMetric : NSObject
 @property(nonatomic, strong) NSString* name;
 @property(nonatomic, strong) NSNumber* duration;
@@ -12,3 +14,5 @@
 @property(nonatomic, strong) NSNumber* endTimestamp;
 - (instancetype)initWithDictionary:(NSDictionary*)dictionary;
 @end
+
+NS_ASSUME_NONNULL_END

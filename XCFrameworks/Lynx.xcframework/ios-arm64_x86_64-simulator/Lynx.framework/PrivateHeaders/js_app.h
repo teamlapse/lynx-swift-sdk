@@ -2,8 +2,8 @@
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
 
-#ifndef CORE_RUNTIME_BINDINGS_JSI_JS_APP_H_
-#define CORE_RUNTIME_BINDINGS_JSI_JS_APP_H_
+#ifndef CORE_RUNTIME_JS_BINDINGS_JS_APP_H_
+#define CORE_RUNTIME_JS_BINDINGS_JS_APP_H_
 
 #include <memory>
 #include <string>
@@ -19,16 +19,16 @@
 #include "core/renderer/dom/vdom/radon/node_select_options.h"
 #include "core/renderer/template_entry.h"
 #include "core/resource/lazy_bundle/bundle_resource_info.h"
-#include "core/runtime/bindings/common/resource/response_promise.h"
-#include "core/runtime/bindings/jsi/api_call_back.h"
-#include "core/runtime/bindings/jsi/event/context_proxy_in_js.h"
-#include "core/runtime/bindings/jsi/js_task_adapter.h"
+#include "core/runtime/common/bindings/resource/response_promise.h"
 #include "core/runtime/common/js_error_reporter.h"
 #include "core/runtime/common/jsi_object_wrapper.h"
-#include "core/runtime/jsi/jsi.h"
-#include "core/runtime/piper/js/js_bundle_holder.h"
-#include "core/runtime/piper/js/lynx_api_handler.h"
-#include "core/runtime/piper/js/template_delegate.h"
+#include "core/runtime/js/bindings/api_call_back.h"
+#include "core/runtime/js/bindings/event/context_proxy_in_js.h"
+#include "core/runtime/js/bindings/js_task_adapter.h"
+#include "core/runtime/js/js_bundle_holder.h"
+#include "core/runtime/js/jsi/jsi.h"
+#include "core/runtime/js/lynx_api_handler.h"
+#include "core/runtime/js/template_delegate.h"
 #include "core/services/fluency/fluency_tracer.h"
 #include "core/template_bundle/template_codec/ttml_constant.h"
 #include "third_party/rapidjson/document.h"
@@ -36,7 +36,6 @@
 namespace lynx {
 
 namespace runtime {
-class LynxRuntime;
 class LynxApiHandler;
 class AnimationFrameTaskHandler;
 }  // namespace runtime
@@ -170,12 +169,8 @@ class App : public std::enable_shared_from_this<App> {
       const std::string entry_name, const std::string& url, long timeout);
   base::expected<Value, JSINativeException> readScript(
       const std::string entry_name, const std::string& url, long timeout);
-  piper::Value setTimeout(
-      std::variant<std::unique_ptr<piper::Function>, double> id_or_callback,
-      int time);
-  piper::Value setInterval(
-      std::variant<std::unique_ptr<piper::Function>, double> id_or_callback,
-      int time);
+  piper::Value setTimeout(piper::Function func, int time);
+  piper::Value setInterval(piper::Function func, int time);
   void clearTimeout(double task);
   piper::Value nativeModuleProxy();
 
@@ -278,8 +273,7 @@ class App : public std::enable_shared_from_this<App> {
 
   void SetJsBundleHolder(const std::weak_ptr<piper::JsBundleHolder>& holder);
 
-  void QueueMicrotask(
-      std::variant<std::unique_ptr<piper::Function>, double> id_or_callback);
+  void QueueMicrotask(piper::Function func);
 
   void SetPageOptions(const tasm::PageOptions& options);
   const tasm::PageOptions& GetPageOptions() { return page_options_; }
@@ -302,8 +296,7 @@ class App : public std::enable_shared_from_this<App> {
         js_app_(),
         delegate_(delegate),
         exception_handler_(exception_handler),
-        js_task_adapter_(
-            std::make_unique<JsTaskAdapter>(rt, app_guid_, page_options)),
+        js_task_adapter_(std::make_unique<JsTaskAdapter>(rt, page_options)),
         nativeModuleProxy_(std::move(nativeModuleProxy)),
         api_handler_(std::move(api_handler)),
         jsi_object_wrapper_manager_(
@@ -386,4 +379,4 @@ class App : public std::enable_shared_from_this<App> {
 
 }  // namespace piper
 }  // namespace lynx
-#endif  // CORE_RUNTIME_BINDINGS_JSI_JS_APP_H_
+#endif  // CORE_RUNTIME_JS_BINDINGS_JS_APP_H_

@@ -18,8 +18,8 @@
 #include "core/renderer/dom/vdom/radon/radon_node.h"
 #include "core/renderer/dom/vdom/radon/radon_slot.h"
 #include "core/renderer/dom/vdom/radon/set_css_variable_op.h"
-#include "core/runtime/vm/lepus/context.h"
-#include "core/runtime/vm/lepus/vm_context.h"
+#include "core/runtime/lepus/context.h"
+#include "core/runtime/lepus/vm_context.h"
 #include "core/template_bundle/template_codec/ttml_constant.h"
 
 namespace lynx {
@@ -210,9 +210,6 @@ class RadonComponent : public RadonNode, public BaseComponent {
 
   void AddRadonSlot(const base::String& name, RadonSlot* slot);
 
-  // for remove component element
-  bool NeedsElement() const override;
-
   // RadonPage & RadonLazyComponent will override this function
   virtual bool NeedsExtraData() const;
 
@@ -370,7 +367,6 @@ class RadonComponent : public RadonNode, public BaseComponent {
   bool compile_render_{false};
   bool data_dirty_{true};
   bool properties_dirty_{true};
-  bool update_function_called_{false};
 
   bool need_reset_data_{false};
 
@@ -434,7 +430,7 @@ class RadonComponent : public RadonNode, public BaseComponent {
   // and ComponentElement. And this function will be moved to the utility.
   base::auto_create_optional<SetCSSVariableOpVector> set_variable_ops_;
 
-  NameToSlotMap slots_{kRadonSlotMapAllocationSize};
+  NameToSlotMap slots_;
   NameToPlugMap plugs_;
   std::unique_ptr<RadonSlotsHelper> radon_slots_helper_;
 
@@ -451,7 +447,6 @@ class RadonComponent : public RadonNode, public BaseComponent {
   bool GetNeedElementByEntry();
 
   virtual void RenderRadonComponent(RenderOption&);
-  void DisableCallOnElementRemovedInDestructor();
 
   /*
    * RadonReusableDiffChildren is only used in radon diff list new arch.

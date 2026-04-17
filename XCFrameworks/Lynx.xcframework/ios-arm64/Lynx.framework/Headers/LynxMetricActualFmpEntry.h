@@ -5,9 +5,15 @@
 #import "LynxPerformanceEntry.h"
 #import "LynxPerformanceMetric.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
+/// Deprecated: PipelineEntry contain all properties of MetricActualFmpEntry
+__attribute__((deprecated("PipelineEntry contain all properties of MetricActualFmpEntry")))
 @interface LynxMetricActualFmpEntry : LynxPerformanceEntry
 @property(nonatomic, strong) LynxPerformanceMetric* actualFmp;
 @property(nonatomic, strong) LynxPerformanceMetric* lynxActualFmp;
 @property(nonatomic, strong) LynxPerformanceMetric* totalActualFmp;
 - (instancetype)initWithDictionary:(NSDictionary*)dictionary;
 @end
+
+NS_ASSUME_NONNULL_END

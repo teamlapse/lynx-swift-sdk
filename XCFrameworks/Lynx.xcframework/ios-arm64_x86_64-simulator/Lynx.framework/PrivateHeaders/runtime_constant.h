@@ -2,8 +2,8 @@
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
 
-#ifndef CORE_RUNTIME_PIPER_JS_RUNTIME_CONSTANT_H_
-#define CORE_RUNTIME_PIPER_JS_RUNTIME_CONSTANT_H_
+#ifndef CORE_RUNTIME_JS_RUNTIME_CONSTANT_H_
+#define CORE_RUNTIME_JS_RUNTIME_CONSTANT_H_
 
 #include <string>
 
@@ -101,14 +101,13 @@ constexpr const char kEnableReuseLoadScriptExports[] =
     "enableReuseLoadScriptExports";
 
 /**
- * @name: enableJSCallbackManager
- * @description: use js callbackManager for setTimeout, setInterval and other.
+ * @name: enableFetchAPIStandardStreaming
+ * @description: Make the Lynx Fetch-API support standard http streaming.
  * @platform: Both
- * @supportVersion: 3.5
+ * @supportVersion: 3.7
  **/
-constexpr const char kEnableJSCallbackManager[] = "enableJSCallbackManager";
-
-constexpr const char kInvokeAppMethodName[] = "__invokeAppMethod";
+constexpr const char kEnableFetchAPIStandardStreaming[] =
+    "enableFetchAPIStandardStreaming";
 
 /**
  * Check if the given url indicates lynx_core.js.
@@ -168,4 +167,4 @@ inline bool IsDynamicComponentServiceJS(const std::string &url) {
 }  // namespace runtime
 }  // namespace lynx
 
-#endif  // CORE_RUNTIME_PIPER_JS_RUNTIME_CONSTANT_H_
+#endif  // CORE_RUNTIME_JS_RUNTIME_CONSTANT_H_

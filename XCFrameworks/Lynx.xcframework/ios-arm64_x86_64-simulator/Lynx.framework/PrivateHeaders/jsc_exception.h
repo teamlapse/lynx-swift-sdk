@@ -2,15 +2,15 @@
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
 
-#ifndef CORE_RUNTIME_JSI_JSC_JSC_EXCEPTION_H_
-#define CORE_RUNTIME_JSI_JSC_JSC_EXCEPTION_H_
+#ifndef CORE_RUNTIME_JS_JSI_JSC_JSC_EXCEPTION_H_
+#define CORE_RUNTIME_JS_JSI_JSC_JSC_EXCEPTION_H_
 
 #include <JavaScriptCore/JavaScript.h>
 
 #include <string>
 
-#include "core/runtime/jsi/jsc/jsc_helper.h"
-#include "core/runtime/jsi/jsc/jsc_runtime.h"
+#include "core/runtime/js/jsi/jsc/jsc_helper.h"
+#include "core/runtime/js/jsi/jsc/jsc_runtime.h"
 
 namespace lynx {
 namespace piper {
@@ -30,4 +30,4 @@ class JSCException : public JSError {
 
 }  // namespace piper
 }  // namespace lynx
-#endif  // CORE_RUNTIME_JSI_JSC_JSC_EXCEPTION_H_
+#endif  // CORE_RUNTIME_JS_JSI_JSC_JSC_EXCEPTION_H_

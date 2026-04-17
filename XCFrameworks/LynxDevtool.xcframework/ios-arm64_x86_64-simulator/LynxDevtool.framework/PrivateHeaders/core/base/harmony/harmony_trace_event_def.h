@@ -22,10 +22,10 @@ inline constexpr const char* const CALL_JSB_ON_ARK_TS = "CallJSBOnArkTS";
 inline constexpr const char* const PUB_VALUE_TO_LEPUS_VALUE =
     "PubValueToLepusValue";
 /**
- * @history_name{InvokeNativeModule}
+ * @history_name{NativeModule::Invoke}
  */
 inline constexpr const char* const HARMONY_NATIVE_MODULE_INVOKE =
-    "NativeModule::Invoke";
+    "CallPlatformImplementation";
 inline constexpr const char* const INVOKE_CALLBACK_ON_UI_THREAD =
     "InvokeCallbackOnUIThread";
 inline constexpr const char* const NAPI_VALUE_TO_LEPUS_VALUE =
@@ -68,7 +68,11 @@ inline constexpr const char* const UIBASE_APPLY_TRANSFORM =
     "UIBase::ApplyTransform";
 inline constexpr const char* const UIBASE_CREATE_OR_UPDATE_BACKGROUND =
     "UIBase::CreateOrUpdateBackground";
-inline constexpr const char* const UIBASE_CREATE_ON_DRAW = "UIBase::OnDraw";
+inline constexpr const char* const UIBASE_ON_DRAW = "UIBase::OnDraw";
+inline constexpr const char* const UIBASE_ON_DRAW_BEHIND =
+    "UIBase::OnDrawBehind";
+inline constexpr const char* const UIBASE_ON_OVERLAY_DRAW =
+    "UIBase::OnOverlayDraw";
 inline constexpr const char* const UIBASE_INIT_DRAW_NODE =
     "UIBase::InitDrawNode";
 inline constexpr const char* const UI_EXPOSURE_EXEC = "UIExposure::Exec";

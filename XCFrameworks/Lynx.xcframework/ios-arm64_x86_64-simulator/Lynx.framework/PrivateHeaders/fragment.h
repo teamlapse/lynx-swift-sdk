@@ -7,9 +7,10 @@
 #include <memory>
 
 #include "core/renderer/dom/base_element_container.h"
+#include "core/renderer/dom/fragment/box_model_recorder.h"
 #include "core/renderer/dom/fragment/display_list_builder.h"
 #include "core/renderer/dom/fragment/fragment_behavior.h"
-#include "core/renderer/starlight/types/layout_result.h"
+#include "core/renderer/dom/fragment/layout_info.h"
 
 namespace lynx {
 namespace starlight {
@@ -41,15 +42,26 @@ class Fragment : public BaseElementContainer {
     fragment_from_element_parent_ = fragment_from_element_parent;
   }
 
+  bool HasUIPrimitive() const override;
+
   void InsertElementContainerAccordingToElement(Element* child,
                                                 Element* ref) override;
 
   void RemoveElementContainerAccordingToElement(Element* child,
                                                 bool destroy) override;
-  void Destroy() override{};
+  void Destroy() override {
+    if (behavior_) {
+      behavior_->Destroy();
+    }
+    if (has_platform_renderer_) {
+      painting_context()->DestroyPaintingNode(
+          0 /* will be ignored, directly destroy it */, id(),
+          -1 /* will be ignored when remove*/);
+    }
+  };
 
   void UpdateLayout(float left, float top,
-                    bool transition_view = false) override{};
+                    bool transition_view = false) override;
   void UpdateLayoutWithoutChange() override{};
 
   void TransitionToNativeView(fml::RefPtr<PropBundle> prop_bundle) override{};
@@ -62,12 +74,23 @@ class Fragment : public BaseElementContainer {
       bool tend_to_flatten,
       const fml::RefPtr<PropBundle>& painting_data) override;
 
-  void CreateLayerIfNeeded();
+  void InsertListItemPaintingNode(int32_t child_id) override;
+  void RemoveListItemPaintingNode(int32_t child_id) override;
+  void UpdateContentOffsetForListContainer(float content_size, float delta_x,
+                                           float delta_y,
+                                           bool is_init_scroll_offset,
+                                           bool from_layout) override;
+
+  void CreateLayerIfNeeded(const fml::RefPtr<PropBundle>& init_data);
   void HandleAttributes(const fml::RefPtr<PropBundle>& painting_data) const;
 
   void UpdateLayout(LayoutResultForRendering layout_result_for_rendering);
 
   void SetBehavior(std::unique_ptr<FragmentBehavior> behavior);
+
+  // Called when the element is being destroyed. Notifies the behavior to
+  // release platform resources while they are still accessible.
+  void OnElementDestroying();
 
   void Draw();
 
@@ -75,27 +98,72 @@ class Fragment : public BaseElementContainer {
 
   void OnDraw(DisplayListBuilder& display_list_builder);
 
+  void SetEventProp(PlatformEventPropName name, const lepus::Value& value);
+
+  void ClearEventProps();
+
+  void AddEventName(PlatformEventName name);
+
+  void ClearEventNames();
+
+  const PlatformEventPropMap& EventProps() const { return event_props_; }
+
+  const base::Vector<PlatformEventName>& EventNames() const {
+    return event_names_;
+  }
+
+  void DrawChildren(DisplayListBuilder& display_list_builder);
+
   void AddChildBefore(Fragment* child, Fragment* sibling);
 
   void RemoveSelf();
 
   void RemoveChild(Fragment* child);
 
+  void UpdatePlatformExtraBundle(PlatformExtraBundle* bundle) override;
+
   bool IsReliableSibling() const;
 
-  const auto& LayoutResult() const { return layout_result_for_rendering_; }
+  const auto& LayoutResult() const { return layout_info_; }
+
+  int32_t DefineBorderBox(DisplayListBuilder& display_list_builder);
+  int32_t DefinePaddingBox(DisplayListBuilder& display_list_builder);
+  int32_t DefineContentBox(DisplayListBuilder& display_list_builder);
+
+  void SetTextBundle(intptr_t bundle);
+
+ protected:
+  static const int32_t kDefaultDrawNodeCapacity;
+
+  bool is_fragment() const override { return true; }
 
  private:
+  void CheckRootIfNeedClipBounds(DisplayListBuilder& display_list_builder);
+  void UpdateBorderRadiusAccordingToLayoutInfo();
+  void UpdateRenderOffsetRecursively(float left, float top, Fragment* root);
+
   void DrawBorder(DisplayListBuilder& display_list_builder);
   void DrawClip(DisplayListBuilder& display_list_builder);
 
   void DrawBackground(DisplayListBuilder& display_list_builder);
+  void DrawTransform(DisplayListBuilder& display_list_builder);
+  void DrawOpacity(DisplayListBuilder& display_list_builder);
+
+  // Performs a full redraw of this fragment including background, border,
+  // children, etc. Called by OnDraw when NeedRedraw() is true.
+  void DrawFull(DisplayListBuilder& display_list_builder);
 
   void ReinsertDescendantsToCorrectParent();
 
   void RemoveDescendantsFromCurrentParent();
 
   void MoveDirectStackingChildren(Fragment* parent, Fragment* child);
+
+  void MarkHasExposureEventIfNeeded() const;
+
+  void ReconstructEventTargetTreeForExposure() const;
+
+  void DispatchUpdateDisplayList();
 
   bool has_platform_renderer_{false};
 
@@ -120,9 +188,18 @@ class Fragment : public BaseElementContainer {
   base::InlineLinearFlatSet<Fragment*, kChildrenInlineVectorSize>
       fixed_children_;
 
-  LayoutResultForRendering layout_result_for_rendering_;
+  LayoutInfoForDraw layout_info_;
+
+  BoxModelRecorder box_recorder_;
 
   std::unique_ptr<FragmentBehavior> behavior_;
+
+  PlatformEventPropMap event_props_;
+  base::Vector<PlatformEventName> event_names_;
+
+  float render_offset_[2] = {0, 0};
+
+  int32_t draw_node_capacity_{0};
 };
 
 }  // namespace tasm

@@ -2,15 +2,15 @@
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
 
-#ifndef CORE_RUNTIME_JSCACHE_QUICKJS_BYTECODE_QUICKJS_BYTECODE_PROVIDER_SRC_H_
-#define CORE_RUNTIME_JSCACHE_QUICKJS_BYTECODE_QUICKJS_BYTECODE_PROVIDER_SRC_H_
+#ifndef CORE_RUNTIME_JS_BYTECODE_QUICKJS_BYTECODE_QUICKJS_BYTECODE_PROVIDER_SRC_H_
+#define CORE_RUNTIME_JS_BYTECODE_QUICKJS_BYTECODE_QUICKJS_BYTECODE_PROVIDER_SRC_H_
 
 #include <memory>
 #include <string>
 #include <utility>
 
-#include "core/runtime/jscache/quickjs/bytecode/quickjs_bytecode.h"
-#include "core/runtime/jsi/jsi.h"
+#include "core/runtime/js/bytecode/quickjs/bytecode/quickjs_bytecode.h"
+#include "core/runtime/js/jsi/jsi.h"
 #include "core/template_bundle/template_codec/version.h"
 extern "C" {
 #include "quickjs/include/quickjs.h"
@@ -84,4 +84,4 @@ class QuickjsBytecodeProviderSrc {
 }  // namespace piper
 }  // namespace lynx
 
-#endif  // CORE_RUNTIME_JSCACHE_QUICKJS_BYTECODE_QUICKJS_BYTECODE_PROVIDER_SRC_H_
+#endif  // CORE_RUNTIME_JS_BYTECODE_QUICKJS_BYTECODE_QUICKJS_BYTECODE_PROVIDER_SRC_H_

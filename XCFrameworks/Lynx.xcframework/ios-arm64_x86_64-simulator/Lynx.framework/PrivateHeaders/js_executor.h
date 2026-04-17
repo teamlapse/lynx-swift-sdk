@@ -1,8 +1,8 @@
 // Copyright 2023 The Lynx Authors. All rights reserved.
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
-#ifndef CORE_RUNTIME_PIPER_JS_JS_EXECUTOR_H_
-#define CORE_RUNTIME_PIPER_JS_JS_EXECUTOR_H_
+#ifndef CORE_RUNTIME_JS_JS_EXECUTOR_H_
+#define CORE_RUNTIME_JS_JS_EXECUTOR_H_
 
 #include <memory>
 #include <string>
@@ -11,12 +11,12 @@
 
 #include "core/base/lynx_export.h"
 #include "core/public/page_options.h"
-#include "core/runtime/bindings/jsi/global.h"
-#include "core/runtime/bindings/jsi/js_app.h"
-#include "core/runtime/bindings/jsi/modules/lynx_jsi_module_binding.h"
-#include "core/runtime/bindings/jsi/modules/lynx_jsi_module_callback.h"
-#include "core/runtime/bindings/jsi/modules/lynx_module_manager.h"
-#include "core/runtime/jsi/jsi.h"
+#include "core/runtime/js/bindings/global.h"
+#include "core/runtime/js/bindings/js_app.h"
+#include "core/runtime/js/bindings/modules/lynx_jsi_module_binding.h"
+#include "core/runtime/js/bindings/modules/lynx_jsi_module_callback.h"
+#include "core/runtime/js/bindings/modules/lynx_module_manager.h"
+#include "core/runtime/js/jsi/jsi.h"
 #include "third_party/rapidjson/document.h"
 #if ENABLE_TESTBENCH_REPLAY
 #include "core/services/replay/lynx_module_manager_testbench.h"
@@ -106,4 +106,4 @@ class LYNX_EXPORT_FOR_DEVTOOL JSExecutor {
 
 }  // namespace piper
 }  // namespace lynx
-#endif  // CORE_RUNTIME_PIPER_JS_JS_EXECUTOR_H_
+#endif  // CORE_RUNTIME_JS_JS_EXECUTOR_H_

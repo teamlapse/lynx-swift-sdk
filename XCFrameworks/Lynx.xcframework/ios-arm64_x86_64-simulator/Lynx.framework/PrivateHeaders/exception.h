@@ -1,14 +1,14 @@
 // Copyright 2019 The Lynx Authors. All rights reserved.
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
-#ifndef CORE_RUNTIME_VM_LEPUS_EXCEPTION_H_
-#define CORE_RUNTIME_VM_LEPUS_EXCEPTION_H_
+#ifndef CORE_RUNTIME_LEPUS_EXCEPTION_H_
+#define CORE_RUNTIME_LEPUS_EXCEPTION_H_
 
 #include <sstream>
 #include <string>
 
 #include "core/base/json/json_util.h"
-#include "core/runtime/vm/lepus/token.h"
+#include "core/runtime/lepus/token.h"
 #include "third_party/rapidjson/document.h"
 
 namespace lynx {
@@ -106,4 +106,4 @@ class ParseException : public Exception {
 }  // namespace lepus
 }  // namespace lynx
 
-#endif  // CORE_RUNTIME_VM_LEPUS_EXCEPTION_H_
+#endif  // CORE_RUNTIME_LEPUS_EXCEPTION_H_

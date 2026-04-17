@@ -2,8 +2,8 @@
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
 
-#ifndef CORE_RUNTIME_VM_LEPUS_BASE_BINARY_READER_H_
-#define CORE_RUNTIME_VM_LEPUS_BASE_BINARY_READER_H_
+#ifndef CORE_RUNTIME_LEPUS_BASE_BINARY_READER_H_
+#define CORE_RUNTIME_LEPUS_BASE_BINARY_READER_H_
 
 #include <memory>
 #include <string>
@@ -13,9 +13,9 @@
 
 #include "base/include/fml/memory/ref_counted.h"
 #include "base/include/value/base_value.h"
-#include "core/runtime/vm/lepus/binary_reader.h"
-#include "core/runtime/vm/lepus/function.h"
-#include "core/runtime/vm/lepus/regexp.h"
+#include "core/runtime/lepus/binary_reader.h"
+#include "core/runtime/lepus/function.h"
+#include "core/runtime/lepus/regexp.h"
 #include "core/template_bundle/template_codec/compile_options.h"
 #include "core/template_bundle/template_codec/template_binary.h"
 
@@ -144,9 +144,9 @@ class BaseBinaryReader : public BinaryReader {
   // base::String section
   bool DeserializeStringSection();
 
-  bool DecodeUtf8Str(base::String&);
-  bool DecodeUtf8Str(std::string*);
-  bool DecodeUtf8Str(lynx_value&);
+  virtual bool DecodeUtf8Str(base::String&);
+  virtual bool DecodeUtf8Str(std::string*);
+  virtual bool DecodeUtf8Str(lynx_value&);
   bool DecodeTable(fml::RefPtr<Dictionary>&, bool = false);
   bool DecodeArray(fml::RefPtr<CArray>&);
   bool DecodeValue(Value*, bool = false);
@@ -167,6 +167,7 @@ class BaseBinaryReader : public BinaryReader {
   std::vector<fml::RefPtr<Function>> func_vec;
 #endif
   tasm::CompileOptions compile_options_;
+  int has_feature_lepus_closure_{-1};  // -1 unset, 0 and 1 for bool value
 
  private:
   tasm::StringListVec string_list_;
@@ -175,4 +176,4 @@ class BaseBinaryReader : public BinaryReader {
 }  // namespace lepus
 }  // namespace lynx
 
-#endif  // CORE_RUNTIME_VM_LEPUS_BASE_BINARY_READER_H_
+#endif  // CORE_RUNTIME_LEPUS_BASE_BINARY_READER_H_

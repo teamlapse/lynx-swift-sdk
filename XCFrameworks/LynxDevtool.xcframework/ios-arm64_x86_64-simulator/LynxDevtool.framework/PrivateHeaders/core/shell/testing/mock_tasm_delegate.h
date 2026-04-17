@@ -15,10 +15,11 @@
 #include "base/include/debug/lynx_error.h"
 #include "core/renderer/dom/element_manager.h"
 #include "core/renderer/dom/lynx_get_ui_result.h"
+#include "core/renderer/layout_scheduler/layout_scheduler.h"
 #include "core/renderer/template_assembler.h"
 #include "core/renderer/ui_wrapper/layout/layout_context.h"
-#include "core/runtime/bindings/common/event/message_event.h"
-#include "core/runtime/bindings/jsi/api_call_back.h"
+#include "core/runtime/common/bindings/event/message_event.h"
+#include "core/runtime/js/bindings/api_call_back.h"
 #include "core/shell/common/platform_call_back_manager.h"
 #include "third_party/googletest/googlemock/include/gmock/gmock.h"
 
@@ -28,7 +29,7 @@ namespace test {
 
 class MockTasmDelegate : public TemplateAssembler::Delegate,
                          public ElementManager::Delegate,
-                         public TemplateAssembler::LayoutScheduler {
+                         public LayoutScheduler::LayoutSchedulerImpl {
  public:
   MockTasmDelegate() = default;
   virtual ~MockTasmDelegate() {}
@@ -139,11 +140,6 @@ class MockTasmDelegate : public TemplateAssembler::Delegate,
   std::string DumpDelegate() { return ss_.str(); }
   void ResetThemeConfig();
 
-  void DispatchLayoutUpdates(
-      const std::shared_ptr<PipelineOptions>& options) override {
-    dispatch_layout_updates_called_ = true;
-  }
-
   MOCK_METHOD(void, UpdateLayoutNodeFontSize,
               (int32_t id, double cur_node_font_size,
                double root_node_font_size, double font_scale),
@@ -151,9 +147,6 @@ class MockTasmDelegate : public TemplateAssembler::Delegate,
 
   MOCK_METHOD(void, InsertLayoutNode,
               (int32_t parent_id, int32_t child_id, int index), (override));
-
-  MOCK_METHOD(void, RemoveLayoutNodeAtIndex, (int32_t parent_id, int index),
-              (override));
 
   MOCK_METHOD(void, InsertLayoutNodeBefore,
               (int32_t parent_id, int32_t child_id, int32_t ref_id),
@@ -236,7 +229,9 @@ class MockTasmDelegate : public TemplateAssembler::Delegate,
   void InvokeResponsePromiseCallback(base::closure closure) override{};
 
   void RequestLayout(
-      const std::shared_ptr<tasm::PipelineOptions>& options) override{};
+      const std::shared_ptr<tasm::PipelineOptions>& options) override {
+    dispatch_layout_updates_called_ = true;
+  };
 
   event::DispatchEventResult DispatchMessageEvent(
       fml::RefPtr<runtime::MessageEvent> event) override;

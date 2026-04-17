@@ -2,8 +2,8 @@
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
 
-#ifndef CORE_RUNTIME_VM_LEPUS_CONTEXT_POOL_H_
-#define CORE_RUNTIME_VM_LEPUS_CONTEXT_POOL_H_
+#ifndef CORE_RUNTIME_LEPUS_CONTEXT_POOL_H_
+#define CORE_RUNTIME_LEPUS_CONTEXT_POOL_H_
 
 #include <memory>
 #include <mutex>
@@ -11,7 +11,7 @@
 #include <utility>
 
 #include "base/include/vector.h"
-#include "core/runtime/vm/lepus/context.h"
+#include "core/runtime/lepus/context.h"
 #include "core/template_bundle/template_codec/binary_decoder/page_config.h"
 #include "core/template_bundle/template_codec/compile_options.h"
 
@@ -62,7 +62,9 @@ class LynxContextPool : public std::enable_shared_from_this<LynxContextPool> {
             page_configs ? page_configs->GetEnableSignalAPIBoolValue() : false),
         target_sdk_version_(compile_options.target_sdk_version_),
         context_bundle_(context_bundle),
-        arch_option_(compile_options.arch_option_) {}
+        arch_option_(compile_options.arch_option_),
+        enable_mts_pre_execute_(
+            page_configs ? page_configs->GetEnableMTSPreExecute() : false) {}
 
   void AddContextSafely(int32_t count);
 
@@ -74,6 +76,7 @@ class LynxContextPool : public std::enable_shared_from_this<LynxContextPool> {
   const std::string target_sdk_version_;
   const std::shared_ptr<ContextBundle> context_bundle_{nullptr};
   const tasm::ArchOption arch_option_{tasm::RADON_ARCH};
+  const bool enable_mts_pre_execute_{false};
 
   std::mutex mtx_;
   base::InlineVector<std::shared_ptr<lepus::Context>, 8> contexts_;
@@ -82,4 +85,4 @@ class LynxContextPool : public std::enable_shared_from_this<LynxContextPool> {
 }  // namespace lepus
 }  // namespace lynx
 
-#endif  // CORE_RUNTIME_VM_LEPUS_CONTEXT_POOL_H_
+#endif  // CORE_RUNTIME_LEPUS_CONTEXT_POOL_H_

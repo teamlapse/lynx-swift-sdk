@@ -2,8 +2,8 @@
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
 
-#ifndef CORE_RUNTIME_BINDINGS_JSI_EVENT_CONTEXT_PROXY_IN_JS_H_
-#define CORE_RUNTIME_BINDINGS_JSI_EVENT_CONTEXT_PROXY_IN_JS_H_
+#ifndef CORE_RUNTIME_JS_BINDINGS_EVENT_CONTEXT_PROXY_IN_JS_H_
+#define CORE_RUNTIME_JS_BINDINGS_EVENT_CONTEXT_PROXY_IN_JS_H_
 
 #include <memory>
 #include <string>
@@ -11,9 +11,9 @@
 #include <vector>
 
 #include "base/include/value/base_value.h"
-#include "core/runtime/bindings/common/event/context_proxy.h"
-#include "core/runtime/bindings/common/event/message_event.h"
-#include "core/runtime/jsi/jsi.h"
+#include "core/runtime/common/bindings/event/context_proxy.h"
+#include "core/runtime/common/bindings/event/message_event.h"
+#include "core/runtime/js/jsi/jsi.h"
 
 namespace lynx {
 namespace piper {
@@ -45,4 +45,4 @@ class ContextProxyInJS : public HostObject, public runtime::ContextProxy {
 }  // namespace piper
 }  // namespace lynx
 
-#endif  // CORE_RUNTIME_BINDINGS_JSI_EVENT_CONTEXT_PROXY_IN_JS_H_
+#endif  // CORE_RUNTIME_JS_BINDINGS_EVENT_CONTEXT_PROXY_IN_JS_H_

@@ -12,7 +12,7 @@
 
 #import "LynxErrorReceiverProtocol.h"
 #include "core/public/vsync_observer_interface.h"
-#include "core/runtime/piper/js/runtime_lifecycle_listener_delegate.h"
+#include "core/runtime/js/runtime_lifecycle_listener_delegate.h"
 #include "third_party/binding/napi/shim/shim_napi.h"
 
 namespace lynx {
@@ -34,7 +34,7 @@ class RuntimeLifecycleListenerDelegateDarwin
   void OnRuntimeInit(int64_t runtime_id) final{};
   void OnAppEnterForeground() final{};
   void OnAppEnterBackground() final{};
-  void OnRuntimeAttach(Napi::Env env) override;
+  void OnRuntimeAttach(void* env) override;
   void OnRuntimeDetach() override;
 
  private:

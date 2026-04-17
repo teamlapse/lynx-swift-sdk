@@ -7,8 +7,8 @@
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
 
-#ifndef CORE_RUNTIME_JSI_JSC_JSC_HOST_FUNCTION_H_
-#define CORE_RUNTIME_JSI_JSC_JSC_HOST_FUNCTION_H_
+#ifndef CORE_RUNTIME_JS_JSI_JSC_JSC_HOST_FUNCTION_H_
+#define CORE_RUNTIME_JS_JSI_JSC_JSC_HOST_FUNCTION_H_
 
 #include <JavaScriptCore/JavaScript.h>
 
@@ -18,8 +18,8 @@
 #include <string>
 #include <utility>
 
-#include "core/runtime/jsi/jsc/jsc_runtime.h"
-#include "core/runtime/jsi/jsi.h"
+#include "core/runtime/js/jsi/jsc/jsc_runtime.h"
+#include "core/runtime/js/jsi/jsi.h"
 
 namespace lynx {
 namespace piper {
@@ -63,4 +63,4 @@ class HostFunctionMetadata
 }  // namespace detail
 }  // namespace piper
 }  // namespace lynx
-#endif  // CORE_RUNTIME_JSI_JSC_JSC_HOST_FUNCTION_H_
+#endif  // CORE_RUNTIME_JS_JSI_JSC_JSC_HOST_FUNCTION_H_

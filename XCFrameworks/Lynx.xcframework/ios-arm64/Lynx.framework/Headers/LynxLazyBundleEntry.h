@@ -4,6 +4,8 @@
 #import <Foundation/Foundation.h>
 #import "LynxPerformanceEntry.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface LynxLazyBundleEntry : LynxPerformanceEntry
 @property(nonatomic, strong) NSString* componentUrl;
 @property(nonatomic, strong) NSString* mode;
@@ -16,3 +18,5 @@
 @property(nonatomic, strong) NSNumber* decodeEnd;
 - (instancetype)initWithDictionary:(NSDictionary*)dictionary;
 @end
+
+NS_ASSUME_NONNULL_END

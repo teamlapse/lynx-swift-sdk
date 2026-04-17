@@ -33,6 +33,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, readonly) BOOL disableOptPushStyleToBundle;
 @property(nonatomic, readonly) BOOL enableTextGradientOpt;
 
+@property(nonatomic, readonly) BOOL enableUnifyFixedBehavior;
+@property(nonatomic, readonly) BOOL enableBatchLayoutTaskWithSyncLayout;
+
 // rgba : red_green_blue_alpha
 @property(nonatomic, readonly) UIColor* backgroundColor;
 @property(nonatomic, readonly) BOOL enableSizeOptimization;

@@ -5,6 +5,8 @@
 #import "LynxPerformanceEntry.h"
 #import "LynxPerformanceMetric.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface LynxMetricFspEntry : LynxPerformanceEntry
 @property(nonatomic, strong) LynxPerformanceMetric* fsp;
 @property(nonatomic, strong) LynxPerformanceMetric* lynxFsp;
@@ -16,3 +18,5 @@
 @property(nonatomic, strong) NSNumber* containerFillPercentageContainerArea;
 - (instancetype)initWithDictionary:(NSDictionary*)dictionary;
 @end
+
+NS_ASSUME_NONNULL_END

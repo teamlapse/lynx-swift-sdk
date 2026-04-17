@@ -13,11 +13,11 @@ namespace debugrouter {
 namespace net {
 
 // custom error for websocket
-static const int kParseUrlErrorCode = -102;
-static const int kNullSocketGuard = -103;
-static const int kUnexpectedOpcode = -104;
-static const int kUnexpectedMaskPayloadLen = -105;
-static const int kDeflatedMessageUnimplemented = -106;
+extern const int kParseUrlErrorCode;
+extern const int kNullSocketGuard;
+extern const int kUnexpectedOpcode;
+extern const int kUnexpectedMaskPayloadLen;
+extern const int kDeflatedMessageUnimplemented;
 
 class WebSocketTask : public base::WorkThreadExecutor {
  public:
@@ -37,12 +37,14 @@ class WebSocketTask : public base::WorkThreadExecutor {
 
   void onOpen();
   void onFailure(const std::string &error_message, int error_code);
+  void onClose();
   void onMessage(const std::string &msg);
 
  private:
   std::weak_ptr<core::MessageTransceiver> transceiver_;
   std::string url_;
   std::unique_ptr<base::SocketGuard> socket_guard_;
+  std::atomic<bool> is_connected_ = {false};
 };
 
 }  // namespace net

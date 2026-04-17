@@ -12,7 +12,7 @@
 #include "core/renderer/css/css_value.h"
 #include "core/renderer/css/shared_css_fragment.h"
 #include "core/renderer/simple_styling/style_object_decoder.h"
-#include "core/runtime/vm/lepus/base_binary_reader.h"
+#include "core/runtime/lepus/base_binary_reader.h"
 #include "core/template_bundle/template_codec/template_binary.h"
 
 namespace lynx {
@@ -48,6 +48,10 @@ class LynxBinaryBaseCSSReader : public lepus::BaseBinaryReader,
   static bool EnableCssVariableMultiDefaultValue(const CompileOptions& options);
 
   bool DecodeStyleObject(StyleMap& attr, const CSSRange& range) override;
+
+  bool DecodeUtf8Str(base::String& result) override;
+  bool DecodeUtf8Str(std::string* result) override;
+  bool DecodeUtf8Str(lynx_value& result) override;
 
  protected:
   // Utils for decode css.
@@ -85,6 +89,7 @@ class LynxBinaryBaseCSSReader : public lepus::BaseBinaryReader,
   std::string absetting_disable_css_lazy_decode_;
   bool enable_pre_process_attributes_{false};
   bool enable_css_inline_variables_{false};
+  bool decode_string_directly_{false};
 };
 
 }  // namespace tasm

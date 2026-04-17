@@ -2,12 +2,12 @@
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
 
-#ifndef CORE_RUNTIME_JSCACHE_JS_CACHE_TRACKER_H_
-#define CORE_RUNTIME_JSCACHE_JS_CACHE_TRACKER_H_
+#ifndef CORE_RUNTIME_JS_BYTECODE_JS_CACHE_TRACKER_H_
+#define CORE_RUNTIME_JS_BYTECODE_JS_CACHE_TRACKER_H_
 
 #include <string>
 
-#include "core/runtime/jsi/jsi.h"
+#include "core/runtime/js/jsi/jsi.h"
 #include "core/services/event_report/event_tracker.h"
 
 namespace lynx {
@@ -91,4 +91,4 @@ class JsCacheTracker final {
 }  // namespace piper
 }  // namespace lynx
 
-#endif  // CORE_RUNTIME_JSCACHE_JS_CACHE_TRACKER_H_
+#endif  // CORE_RUNTIME_JS_BYTECODE_JS_CACHE_TRACKER_H_

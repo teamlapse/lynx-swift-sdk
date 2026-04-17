@@ -2,15 +2,15 @@
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
 
-#ifndef CORE_RUNTIME_JSCACHE_QUICKJS_BYTECODE_QUICKJS_BYTECODE_H_
-#define CORE_RUNTIME_JSCACHE_QUICKJS_BYTECODE_QUICKJS_BYTECODE_H_
+#ifndef CORE_RUNTIME_JS_BYTECODE_QUICKJS_BYTECODE_QUICKJS_BYTECODE_H_
+#define CORE_RUNTIME_JS_BYTECODE_QUICKJS_BYTECODE_QUICKJS_BYTECODE_H_
 
 #include <memory>
 #include <string>
 #include <utility>
 
 #include "core/renderer/tasm/config.h"
-#include "core/runtime/jsi/jsi.h"
+#include "core/runtime/js/jsi/jsi.h"
 #include "core/template_bundle/template_codec/version.h"
 
 namespace lynx {
@@ -72,4 +72,4 @@ struct Bytecode {
 }  // namespace piper
 }  // namespace lynx
 
-#endif  // CORE_RUNTIME_JSCACHE_QUICKJS_BYTECODE_QUICKJS_BYTECODE_H_
+#endif  // CORE_RUNTIME_JS_BYTECODE_QUICKJS_BYTECODE_QUICKJS_BYTECODE_H_

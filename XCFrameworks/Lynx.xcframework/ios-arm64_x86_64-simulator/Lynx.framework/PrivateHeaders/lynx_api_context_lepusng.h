@@ -2,8 +2,8 @@
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
 
-#ifndef CORE_RUNTIME_VM_LEPUS_LYNX_API_CONTEXT_LEPUSNG_H_
-#define CORE_RUNTIME_VM_LEPUS_LYNX_API_CONTEXT_LEPUSNG_H_
+#ifndef CORE_RUNTIME_LEPUSNG_LYNX_API_CONTEXT_LEPUSNG_H_
+#define CORE_RUNTIME_LEPUSNG_LYNX_API_CONTEXT_LEPUSNG_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -31,4 +31,4 @@ struct lynx_api_context__lepusng {
   LEPUSContext* ctx{};
 };
 
-#endif  // CORE_RUNTIME_VM_LEPUS_LYNX_API_CONTEXT_LEPUSNG_H_
+#endif  // CORE_RUNTIME_LEPUSNG_LYNX_API_CONTEXT_LEPUSNG_H_

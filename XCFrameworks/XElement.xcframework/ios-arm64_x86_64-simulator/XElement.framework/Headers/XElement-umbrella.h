@@ -12,6 +12,7 @@
 
 #import "LynxUIInputAutoRegistry.h"
 #import "LynxUIOverlayAutoRegistry.h"
+#import "LynxUISVGAutoRegistry.h"
 #import "LynxUITextAreaAutoRegistry.h"
 #import "LynxUIBaseInput.h"
 #import "LynxUIBaseInputShadowNode.h"
@@ -26,6 +27,8 @@
 #import "LynxOverlayContainer.h"
 #import "LynxOverlayGlobalManager.h"
 #import "LynxUIOverlay.h"
+#import "LynxSVGView.h"
+#import "LynxUISVG.h"
 
 FOUNDATION_EXPORT double XElementVersionNumber;
 FOUNDATION_EXPORT const unsigned char XElementVersionString[];

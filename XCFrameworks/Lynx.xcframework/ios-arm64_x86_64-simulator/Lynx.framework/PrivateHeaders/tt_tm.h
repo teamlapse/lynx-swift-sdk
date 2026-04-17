@@ -5,8 +5,8 @@
 /**
  * this file for time different interface and struct in different platform
  */
-#ifndef CORE_RUNTIME_VM_LEPUS_TT_TM_H_
-#define CORE_RUNTIME_VM_LEPUS_TT_TM_H_
+#ifndef CORE_RUNTIME_LEPUS_TT_TM_H_
+#define CORE_RUNTIME_LEPUS_TT_TM_H_
 namespace lynx {
 namespace lepus {
 
@@ -50,4 +50,4 @@ void GetTimeZone(tm_extend& tm) {
 }  // namespace lepus
 }  // namespace lynx
 
-#endif  // CORE_RUNTIME_VM_LEPUS_TT_TM_H_
+#endif  // CORE_RUNTIME_LEPUS_TT_TM_H_

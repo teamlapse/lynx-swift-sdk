@@ -4,6 +4,10 @@
 #import <Foundation/Foundation.h>
 #import "LynxPerformanceEntry.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
+/// Deprecated: LoadBundleEntry and ReloadBundleEntry contain all properties of InitContainerEntry
+__attribute__((deprecated("LoadBundleEntry and ReloadBundleEntry contain all properties of InitContainerEntry")))
 @interface LynxInitContainerEntry : LynxPerformanceEntry
 @property(nonatomic, strong) NSNumber* openTime;
 @property(nonatomic, strong) NSNumber* containerInitStart;
@@ -13,3 +17,5 @@
 @property(nonatomic, strong) NSDictionary<NSString*, NSNumber*>* extraTiming;
 - (instancetype)initWithDictionary:(NSDictionary*)dictionary;
 @end
+
+NS_ASSUME_NONNULL_END

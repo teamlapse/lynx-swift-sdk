@@ -7,10 +7,11 @@
 #if ENABLE_TRACE_PERFETTO
 #include <memory>
 
-#include "core/runtime/jsi/quickjs/quickjs_context_wrapper.h"
+#include "core/runtime/js/jsi/quickjs/quickjs_context_wrapper.h"
 #include "core/runtime/profile/runtime_profiler.h"
 
 namespace lynx {
+namespace runtime {
 namespace profile {
 
 class QuickjsRuntimeProfiler : public RuntimeProfiler {
@@ -29,6 +30,7 @@ class QuickjsRuntimeProfiler : public RuntimeProfiler {
   std::weak_ptr<piper::QuickjsContextWrapper> weak_context_;
 };
 }  // namespace profile
+}  // namespace runtime
 }  // namespace lynx
 #endif
 #endif  // CORE_RUNTIME_PROFILE_QUICKJS_QUICKJS_RUNTIME_PROFILER_H_

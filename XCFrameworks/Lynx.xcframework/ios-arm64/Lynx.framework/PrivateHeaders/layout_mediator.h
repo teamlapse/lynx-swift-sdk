@@ -34,8 +34,7 @@ class LayoutMediator : public tasm::LayoutContext::Delegate,
   explicit LayoutMediator(
       const std::shared_ptr<LayoutResultManager> &layout_result_manager);
 
-  void SetRuntimeActor(
-      const std::shared_ptr<LynxActor<runtime::LynxRuntime>> &actor) {
+  void SetRuntimeActor(const std::shared_ptr<LynxActor<BTSRuntime>> &actor) {
     runtime_actor_ = actor;
   }
 
@@ -66,9 +65,6 @@ class LayoutMediator : public tasm::LayoutContext::Delegate,
     node_manager_ = node_manager;
     catalyzer_ = catalyzer;
   }
-  void SetEnableAirStrictMode(bool enable_air_strict_mode) override {
-    enable_air_strict_mode_ = enable_air_strict_mode;
-  }
 
   void SetPageOptions(const tasm::PageOptions &page_options) {
     page_options_ = page_options;
@@ -92,7 +88,7 @@ class LayoutMediator : public tasm::LayoutContext::Delegate,
 
   std::shared_ptr<LynxActor<LynxEngine>> engine_actor_;
   std::shared_ptr<LynxActor<NativeFacade>> facade_actor_;
-  std::shared_ptr<LynxActor<runtime::LynxRuntime>> runtime_actor_;
+  std::shared_ptr<LynxActor<BTSRuntime>> runtime_actor_;
   std::shared_ptr<LynxActor<tasm::performance::PerformanceController>>
       perf_controller_actor_;
 
@@ -109,7 +105,6 @@ class LayoutMediator : public tasm::LayoutContext::Delegate,
   // TODO(heshan):now trigger onFirstScreen when first layout,
   // but it may be triggered when update data...
   bool has_first_layout_{false};
-  bool enable_air_strict_mode_{false};
   tasm::PageOptions page_options_;
 };
 

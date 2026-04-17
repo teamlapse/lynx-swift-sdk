@@ -5,9 +5,15 @@
 #import "LynxPerformanceEntry.h"
 #import "LynxPerformanceMetric.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
+/// Deprecated: LoadBundleEntry and ReloadBundleEntry contain all properties of MetricFcpEntry
+__attribute__((deprecated("LoadBundleEntry and ReloadBundleEntry contain all properties of MetricFcpEntry")))
 @interface LynxMetricFcpEntry : LynxPerformanceEntry
 @property(nonatomic, strong) LynxPerformanceMetric* fcp;
 @property(nonatomic, strong) LynxPerformanceMetric* lynxFcp;
 @property(nonatomic, strong) LynxPerformanceMetric* totalFcp;
 - (instancetype)initWithDictionary:(NSDictionary*)dictionary;
 @end
+
+NS_ASSUME_NONNULL_END

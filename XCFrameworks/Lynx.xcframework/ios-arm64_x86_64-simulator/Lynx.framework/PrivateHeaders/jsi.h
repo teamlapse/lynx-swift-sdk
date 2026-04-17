@@ -9,8 +9,8 @@
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
 
-#ifndef CORE_RUNTIME_JSI_JSI_H_
-#define CORE_RUNTIME_JSI_JSI_H_
+#ifndef CORE_RUNTIME_JS_JSI_JSI_H_
+#define CORE_RUNTIME_JS_JSI_JSI_H_
 
 #include <cassert>
 #include <cstring>
@@ -28,6 +28,7 @@
 #include "base/include/expected.h"
 #include "base/include/fml/macros.h"
 #include "base/include/log/logging.h"
+#include "base/include/value/base_string.h"
 #include "base/include/vector.h"
 #include "core/base/lynx_export.h"
 #include "core/build/gen/lynx_sub_error_code.h"
@@ -78,6 +79,18 @@ class StringRefBuffer : public Buffer {
 
  private:
   const std::string& s_;
+};
+
+class BaseStringBuffer : public Buffer {
+ public:
+  explicit BaseStringBuffer(const base::String& s) : s_(s) {}
+  size_t size() const override { return s_.length(); }
+  const uint8_t* data() const override {
+    return reinterpret_cast<const uint8_t*>(s_.c_str());
+  }
+
+ private:
+  base::String s_;
 };
 
 class ByteBuffer : public Buffer {
@@ -1750,5 +1763,5 @@ class StartupData {
 
 }  // namespace lynx
 
-#include "core/runtime/jsi/jsi-inl.h"
-#endif  // CORE_RUNTIME_JSI_JSI_H_
+#include "core/runtime/js/jsi/jsi-inl.h"
+#endif  // CORE_RUNTIME_JS_JSI_JSI_H_

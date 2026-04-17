@@ -2,8 +2,8 @@
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
 
-#ifndef CORE_RUNTIME_JSI_QUICKJS_QUICKJS_RUNTIME_WRAPPER_H_
-#define CORE_RUNTIME_JSI_QUICKJS_QUICKJS_RUNTIME_WRAPPER_H_
+#ifndef CORE_RUNTIME_JS_JSI_QUICKJS_QUICKJS_RUNTIME_WRAPPER_H_
+#define CORE_RUNTIME_JS_JSI_QUICKJS_QUICKJS_RUNTIME_WRAPPER_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -20,7 +20,7 @@ extern "C" {
 #include "base/include/log/logging.h"
 #include "base/include/no_destructor.h"
 #include "base/include/vector.h"
-#include "core/runtime/jsi/jsi.h"
+#include "core/runtime/js/jsi/jsi.h"
 #ifdef OS_IOS
 #include "gc/trace-gc.h"
 #else
@@ -102,4 +102,4 @@ class QuickjsRuntimeInstance : public VMInstance, public GCObserver {
 }  // namespace piper
 }  // namespace lynx
 
-#endif  // CORE_RUNTIME_JSI_QUICKJS_QUICKJS_RUNTIME_WRAPPER_H_
+#endif  // CORE_RUNTIME_JS_JSI_QUICKJS_QUICKJS_RUNTIME_WRAPPER_H_

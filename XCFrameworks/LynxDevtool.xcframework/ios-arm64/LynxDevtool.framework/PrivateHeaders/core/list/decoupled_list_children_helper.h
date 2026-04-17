@@ -11,12 +11,13 @@
 
 #include "base/trace/native/trace_event.h"
 #include "core/list/decoupled_item_holder.h"
-#include "core/list/decoupled_list_orientation_helper.h"
 
 namespace lynx {
 namespace list {
 
 using ItemHolderSet = std::set<ItemHolder*, ItemHolder::Compare>;
+using WeakItemHolderSet =
+    std::set<fml::WeakPtr<ItemHolder>, ItemHolder::WeakCompare>;
 
 // Utility class for traversing all child nodes.
 class ListChildrenHelper {
@@ -56,25 +57,24 @@ class ListChildrenHelper {
   void UpdateTraceDebugInfo(TraceEvent* event);
 #endif
   void AddChild(const ItemHolderSet& children, ItemHolder* item_holder);
-  void AttachChild(ItemHolder* item_holder,
-                   list::ItemElementDelegate* item_delegate);
-  void DetachChild(ItemHolder* item_holder,
-                   list::ItemElementDelegate* item_delegate);
+  void AddChild(const WeakItemHolderSet& children, ItemHolder* item_holder);
+  void AttachChild(ItemHolder* item_holder, ItemElementDelegate* item_delegate);
+  void DetachChild(ItemHolder* item_holder, ItemElementDelegate* item_delegate);
   void ForEachChild(const std::function<bool(ItemHolder*)>& func,
                     bool reverse = false) const;
   void ForEachChild(const ItemHolderSet& children,
                     const std::function<bool(ItemHolder*)>& func,
                     bool reverse = false) const;
+  void ForEachChild(const WeakItemHolderSet& children,
+                    const std::function<bool(ItemHolder*)>& func,
+                    bool reverse = false) const;
   const ItemHolderSet& children() const { return children_; }
   const ItemHolderSet& attached_children() const { return attached_children_; }
-  const std::unordered_map<list::ItemElementDelegate*, ItemHolder*>&
+  const std::unordered_map<ItemElementDelegate*, ItemHolder*>&
   attached_delegate_item_holder_map() const {
     return attached_delegate_item_holder_map_;
   }
   int GetChildCount() const { return static_cast<int>(children_.size()); }
-  int GetAttachedChildCount() const {
-    return static_cast<int>(children_.size());
-  }
   void ClearChildren() { children_.clear(); }
   void ClearLastBindingChildren() { last_binding_children_.clear(); }
   void ClearAttachedChildren() {
@@ -99,6 +99,7 @@ class ListChildrenHelper {
   void ClearOnScreenChildren() { on_screen_children_.clear(); }
   void ClearInPreloadChildren() { in_preload_children_.clear(); }
   void ClearInStickyChildren() { in_sticky_children_.clear(); }
+  void ClearDeferredDestroyItemHolder() { deferred_destroy_children_.clear(); }
   const ItemHolderSet& on_screen_children() const {
     return on_screen_children_;
   }
@@ -111,11 +112,18 @@ class ListChildrenHelper {
   const ItemHolderSet& last_binding_children() const {
     return last_binding_children_;
   }
+  const WeakItemHolderSet& deferred_destroy_children() const {
+    return deferred_destroy_children_;
+  }
   void EraseFromLastBindingChildren(ItemHolder* item_holder);
   void HandleLayoutOrScrollResult(
       const std::function<bool(ItemHolder*)>& insert_handler,
       const std::function<bool(ItemHolder*)>& recycle_handler,
       const std::function<bool(ItemHolder*)>& update_handler);
+  ItemHolder* GetFirstChildFrom(
+      const ItemHolderSet& children, ItemHolder* start_child,
+      const std::function<bool(const ItemHolder*)>& condition_func,
+      bool reverse = false) const;
   void InitStickyItemHolderSet(int thread_mode);
   bool AddToStickyItemHolderSet(ItemHolder* item_holder);
   bool InStickyItemHolderSet(const ItemHolder* item_holder) const;
@@ -130,16 +138,12 @@ class ListChildrenHelper {
     }
   }
 
-  void AddDeferredDestroyItemHolder(ItemHolder* holder);
-  void TraverseDeferredDestroyItemHolder(std::function<void(ItemHolder*)> fn);
-  void DestroyDeferredDestroyItemHolder();
-
  private:
   bool recycle_item_holder_{false};
   bool use_default_sticky_buffer_count_{true};
   StickyItemHolderSet in_sticky_top_children_;
   StickyItemHolderSet in_sticky_bottom_children_;
-  std::unordered_map<list::ItemElementDelegate*, ItemHolder*>
+  std::unordered_map<ItemElementDelegate*, ItemHolder*>
       attached_delegate_item_holder_map_;
   ItemHolderSet children_;
   ItemHolderSet attached_children_;
@@ -150,7 +154,8 @@ class ListChildrenHelper {
   // NOTE: there are maybe some item holders which cant be destroyed in diff
   // process because of animation. And because they are managed by unique_ptr,
   // they cant be managed by themselves.
-  ItemHolderSet deferred_destroy_children_;
+  // And we need to ensure the children's safety during animation process.
+  WeakItemHolderSet deferred_destroy_children_;
 };
 
 }  // namespace list

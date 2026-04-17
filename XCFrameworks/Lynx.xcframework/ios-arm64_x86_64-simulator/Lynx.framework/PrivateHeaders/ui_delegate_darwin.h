@@ -5,6 +5,7 @@
 #ifndef CORE_RENDERER_UI_WRAPPER_PAINTING_IOS_UI_DELEGATE_DARWIN_H_
 #define CORE_RENDERER_UI_WRAPPER_PAINTING_IOS_UI_DELEGATE_DARWIN_H_
 
+#import <Lynx/LynxServiceTextProtocol.h>
 #import <Lynx/LynxShadowNodeOwner.h>
 #import <Lynx/LynxUIOwner.h>
 
@@ -17,9 +18,12 @@ namespace tasm {
 
 class UIDelegateDarwin : public UIDelegate {
  public:
-  UIDelegateDarwin(LynxUIOwner* ui_owner, bool enable_create_ui_async,
+  UIDelegateDarwin(LynxUIOwner* ui_owner, bool use_native_painting_context,
+                   void* textra, bool enable_create_ui_async,
                    LynxShadowNodeOwner* shadow_node_owner)
       : ui_owner_(ui_owner),
+        use_native_painting_context_(use_native_painting_context),
+        textra_(textra),
         enable_create_ui_async_(enable_create_ui_async),
         shadow_node_owner_(shadow_node_owner) {}
   ~UIDelegateDarwin() override = default;
@@ -44,10 +48,12 @@ class UIDelegateDarwin : public UIDelegate {
       const std::shared_ptr<pub::LynxResourceLoader>& resource_loader,
       const fml::RefPtr<fml::TaskRunner>& ui_task_runner,
       const fml::RefPtr<fml::TaskRunner>& layout_task_runner,
-      bool is_embedded_mode = false) override;
+      int32_t instance_id, bool is_embedded_mode = false) override;
 
  private:
   __weak LynxUIOwner* ui_owner_;
+  bool use_native_painting_context_;
+  void* textra_{nullptr};
   bool enable_create_ui_async_;
   __weak LynxShadowNodeOwner* shadow_node_owner_;
   std::shared_ptr<shell::LynxLayoutProxy> layout_proxy_;

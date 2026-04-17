@@ -8,13 +8,13 @@
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
 
-#ifndef CORE_RUNTIME_JSI_JSLIB_H_
-#define CORE_RUNTIME_JSI_JSLIB_H_
+#ifndef CORE_RUNTIME_JS_JSI_JSLIB_H_
+#define CORE_RUNTIME_JS_JSI_JSLIB_H_
 #include <memory>
 #include <string>
 #include <utility>
 
-#include "core/runtime/jsi/jsi.h"
+#include "core/runtime/js/jsi/jsi.h"
 
 namespace lynx {
 namespace piper {
@@ -68,4 +68,4 @@ class QuickjsJavaScriptPreparation final : public piper::PreparedJavaScript {
 
 }  // namespace piper
 }  // namespace lynx
-#endif  // CORE_RUNTIME_JSI_JSLIB_H_
+#endif  // CORE_RUNTIME_JS_JSI_JSLIB_H_

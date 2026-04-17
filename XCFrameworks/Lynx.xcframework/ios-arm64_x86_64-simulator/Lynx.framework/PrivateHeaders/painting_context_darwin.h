@@ -7,7 +7,6 @@
 #import <Foundation/Foundation.h>
 #import <Lynx/LynxUIOwner.h>
 
-#import <atomic>
 #include <memory>
 #include <string>
 #include <vector>
@@ -18,7 +17,7 @@
 #include "core/shell/dynamic_ui_operation_queue.h"
 
 #if ENABLE_TESTBENCH_REPLAY
-#include "core/runtime/vm/lepus/json_parser.h"
+#include "core/runtime/lepus/json_parser.h"
 #endif
 namespace lynx {
 namespace tasm {
@@ -68,7 +67,8 @@ class PaintingContextDarwinRef : public PaintingCtxPlatformRef {
 
 class PaintingContextDarwin : public PaintingCtxPlatformImpl {
  public:
-  PaintingContextDarwin(LynxUIOwner* owner, bool enable_create_ui_async);
+  PaintingContextDarwin(LynxUIOwner* owner, bool enable_create_ui_async,
+                        void* textra_ = nullptr);
   ~PaintingContextDarwin() override;
   virtual void SetUIOperationQueue(
       const std::shared_ptr<shell::UIOperationQueueInterface>& queue) override;
@@ -119,11 +119,6 @@ class PaintingContextDarwin : public PaintingCtxPlatformImpl {
   int32_t GetTagInfo(const std::string& tag_name) override;
   bool IsFlatten(base::MoveOnlyClosure<bool, bool> func) override;
 
-  // LayoutDidFinish is called only LayoutRecursively is actually executed
-  // FinishLayoutOperation on the other hand, is always being called, and it is
-  // called before LayoutDidFinish
-  // TODO(heshan):merge to FinishLayoutOperation...
-  void LayoutDidFinish();
   void FinishLayoutOperation(
       const std::shared_ptr<PipelineOptions>& options) override;
 
@@ -148,7 +143,6 @@ class PaintingContextDarwin : public PaintingCtxPlatformImpl {
   bool enable_create_ui_async_{false};
 
   std::shared_ptr<shell::DynamicUIOperationQueue> queue_;
-  std::atomic<bool> is_layout_finish_ = {false};
 
   int32_t instance_id_ = 0;
 

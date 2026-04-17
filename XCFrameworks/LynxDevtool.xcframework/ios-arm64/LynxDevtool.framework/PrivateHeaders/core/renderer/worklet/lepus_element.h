@@ -11,8 +11,8 @@
 
 #include "core/renderer/events/events.h"
 #include "core/renderer/template_assembler.h"
-#include "core/runtime/bindings/napi/worklet/napi_func_callback.h"
-#include "core/runtime/vm/lepus/quick_context.h"
+#include "core/runtime/lepusng/napi/worklet/napi_func_callback.h"
+#include "core/runtime/lepusng/quick_context.h"
 #include "third_party/binding/napi/napi_bridge.h"
 
 namespace lynx {

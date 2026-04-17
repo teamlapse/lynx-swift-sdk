@@ -77,6 +77,12 @@ NAPI_EXTERN napi_status napi_runtime_call_threadsafe_function(
 NAPI_EXTERN napi_status
 napi_runtime_delete_threadsafe_function(napi_threadsafe_function func);
 
+NAPI_EXTERN napi_status
+napi_runtime_acquire_threadsafe_function(napi_threadsafe_function func);
+
+NAPI_EXTERN napi_status napi_runtime_release_threadsafe_function(
+    napi_threadsafe_function func, napi_threadsafe_function_release_mode mode);
+
 EXTERN_C_END
 
 #ifdef USE_PRIMJS_NAPI

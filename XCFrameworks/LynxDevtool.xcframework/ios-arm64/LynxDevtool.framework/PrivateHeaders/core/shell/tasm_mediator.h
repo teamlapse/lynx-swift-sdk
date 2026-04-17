@@ -13,13 +13,14 @@
 
 #include "base/include/closure.h"
 #include "base/include/lynx_actor.h"
+#include "core/public/pub_value.h"
 #include "core/renderer/ui_wrapper/layout/layout_context.h"
-#include "core/runtime/bindings/common/event/message_event.h"
-#include "core/runtime/piper/js/lynx_runtime.h"
+#include "core/runtime/common/bindings/event/message_event.h"
 #include "core/services/performance/performance_controller.h"
 #include "core/shell/lynx_card_cache_data_manager.h"
 #include "core/shell/lynx_engine.h"
 #include "core/shell/native_facade.h"
+#include "core/shell/runtime/bts/bts_runtime.h"
 #include "core/shell/tasm_platform_invoker.h"
 
 namespace lynx {
@@ -47,8 +48,7 @@ class TasmMediator : public LynxEngine::Delegate {
 
   ~TasmMediator() override;
 
-  void SetRuntimeActor(
-      const std::shared_ptr<LynxActor<runtime::LynxRuntime>>& actor) {
+  void SetRuntimeActor(const std::shared_ptr<LynxActor<BTSRuntime>>& actor) {
     runtime_actor_ = actor;
   }
 
@@ -178,9 +178,7 @@ class TasmMediator : public LynxEngine::Delegate {
   void RequestVsync(
       uintptr_t id,
       base::MoveOnlyClosure<void, int64_t, int64_t> callback) override;
-  // delegate for class element manager
-  void DispatchLayoutUpdates(
-      const std::shared_ptr<tasm::PipelineOptions>& options) override;
+
   std::unordered_map<int32_t, tasm::LayoutInfoArray> GetSubTreeLayoutInfo(
       int32_t root_id, tasm::Viewport viewport = tasm::Viewport{}) override;
 
@@ -199,7 +197,6 @@ class TasmMediator : public LynxEngine::Delegate {
                         int index) override;
   void SendAnimationEvent(const std::string& type, int tag,
                           const lepus::Value& dict) override;
-  void RemoveLayoutNodeAtIndex(int32_t parent_id, int index) override;
   void InsertLayoutNodeBefore(int32_t parent_id, int32_t child_id,
                               int32_t ref_id) override;
   void RemoveLayoutNode(int32_t parent_id, int32_t child_id) override;
@@ -224,6 +221,9 @@ class TasmMediator : public LynxEngine::Delegate {
   void InvokeUIMethod(tasm::LynxGetUIResult ui_result,
                       const std::string& method,
                       fml::RefPtr<tasm::PropBundle> params,
+                      piper::ApiCallBack callback) override;
+  void InvokeUIMethod(tasm::LynxGetUIResult ui_result,
+                      const std::string& method, const pub::Value& params,
                       piper::ApiCallBack callback) override;
 
   void SetPageConfigForLayoutThread(
@@ -271,7 +271,7 @@ class TasmMediator : public LynxEngine::Delegate {
   bool IsEmbeddedModeOn() const { return page_options_.IsEmbeddedModeOn(); }
   std::shared_ptr<LynxActor<NativeFacade>> facade_actor_;
 
-  std::shared_ptr<LynxActor<runtime::LynxRuntime>> runtime_actor_;
+  std::shared_ptr<LynxActor<BTSRuntime>> runtime_actor_;
   std::shared_ptr<LynxActor<tasm::LayoutContext>> layout_actor_;
   std::shared_ptr<LynxActor<LynxEngine>> engine_actor_;
   std::shared_ptr<LynxActor<tasm::performance::PerformanceController>>

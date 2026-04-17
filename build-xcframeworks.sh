@@ -8,7 +8,7 @@ OUTPUT_DIR="$SCRIPT_DIR/XCFrameworks"
 STAMP_FILE="$OUTPUT_DIR/.build_stamp"
 PODFILE="$BUILDER_DIR/Podfile"
 
-FRAMEWORKS="Lynx LynxBase LynxServiceAPI PrimJS LynxService XElement LynxDevtool BaseDevtool DebugRouter SocketRocket"
+FRAMEWORKS="Lynx LynxBase LynxServiceAPI PrimJS LynxService XElement LynxDevtool BaseDevtool DebugRouter SocketRocket ServalSVG"
 
 # Check if rebuild needed
 needs_rebuild() {

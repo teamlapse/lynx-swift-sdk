@@ -174,7 +174,6 @@ static constexpr const char kAbsoluteInContentBound[] =
 static constexpr const char kEnableFixedNew[] = "enableFixedNew";
 static constexpr const char kEnableCSSInheritance[] = "enableCSSInheritance";
 static constexpr const char kCSSAlignWithLegacyW3C[] = "CSSAlignWithLegacyW3C";
-static constexpr const char kEnableCSSStrictMode[] = "enableCSSStrictMode";
 static constexpr const char kUnifyVWVHBehavior[] = "unifyVWVHBehavior";
 static constexpr const char kFontScaleEffectiveOnlyOnSp[] =
     "fontScaleEffectiveOnlyOnSp";
@@ -196,8 +195,19 @@ static constexpr const char kEnableReuseLoadScriptExports[] =
     "enableReuseLoadScriptExports";
 static constexpr const char kEnableCSSInlineVariables[] =
     "enableCSSInlineVariables";
+static constexpr const char kEnableMTSPreExecute[] = "enableMTSPreExecute";
 static constexpr const char kEnablePropertyBasedSimpleStyle[] =
     "enablePropertyBasedSimpleStyle";
+static constexpr const char kEnableUnifyFixedBehavior[] =
+    "enableUnifyFixedBehavior";
+static constexpr const char kEnableTransformedTouchPosition[] =
+    "enableTransformedTouchPosition";
+static constexpr const char kEnableBatchLayoutTaskWithSyncLayout[] =
+    "enableBatchLayoutTaskWithSyncLayout";
+static constexpr const char kEnableiOSAnimationLayerForExposure[] =
+    "enableiOSAnimationLayerForExposure";
+static constexpr const char kEnableFetchAPIStandardStreaming[] =
+    "enableFetchAPIStandardStreaming";
 }  // namespace config
 }  // namespace tasm
 }  // namespace lynx

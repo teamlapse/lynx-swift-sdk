@@ -156,14 +156,6 @@ class LynxConfig : public EntryConfig {
     return enable_use_map_buffer_;
   }
 
-  inline void SetEnableFiberElementForRadonDiff(
-      TernaryBool enable_fiber_element_for_radon_diff) {
-    enable_fiber_element_for_radon_diff_ = enable_fiber_element_for_radon_diff;
-  }
-  inline TernaryBool GetEnableFiberElementForRadonDiff() const {
-    return enable_fiber_element_for_radon_diff_;
-  }
-
   inline void SetEnableOptPushStyleToBundle(
       TernaryBool enable_opt_push_style_to_bundle) {
     enable_opt_push_style_to_bundle_ = enable_opt_push_style_to_bundle;
@@ -766,13 +758,6 @@ class LynxConfig : public EntryConfig {
     return css_configs_.enable_css_inheritance_;
   }
 
-  inline void SetEnableCSSStrictMode(bool enable_css_strict_mode) {
-    css_parser_configs_.enable_css_strict_mode = enable_css_strict_mode;
-  }
-  inline bool GetEnableCSSStrictMode() const {
-    return css_parser_configs_.enable_css_strict_mode;
-  }
-
   inline void SetUnifyVWVH(bool unify_vwvh_behavior) {
     css_configs_.unify_vw_vh_behavior_ = unify_vwvh_behavior;
   }
@@ -860,12 +845,58 @@ class LynxConfig : public EntryConfig {
     return css_configs_.enable_css_inline_variables_;
   }
 
+  inline void SetEnableMTSPreExecute(bool enable_mts_pre_execute) {
+    enable_mts_pre_execute_ = enable_mts_pre_execute;
+  }
+  inline bool GetEnableMTSPreExecute() const { return enable_mts_pre_execute_; }
+
   inline void SetEnablePropertyBasedSimpleStyle(
       bool enable_property_based_simple_style) {
     enable_property_based_simple_style_ = enable_property_based_simple_style;
   }
   inline bool GetEnablePropertyBasedSimpleStyle() const {
     return enable_property_based_simple_style_;
+  }
+
+  inline void SetEnableUnifyFixedBehavior(bool enable_unify_fixed_behavior) {
+    layout_configs_.enable_unify_fixed_behavior_ = enable_unify_fixed_behavior;
+  }
+  inline bool GetEnableUnifyFixedBehavior() const {
+    return layout_configs_.enable_unify_fixed_behavior_;
+  }
+
+  inline void SetEnableTransformedTouchPosition(
+      bool enable_transformed_touch_position) {
+    enable_transformed_touch_position_ = enable_transformed_touch_position;
+  }
+  inline bool GetEnableTransformedTouchPosition() const {
+    return enable_transformed_touch_position_;
+  }
+
+  inline void SetEnableBatchLayoutTaskWithSyncLayout(
+      bool enable_batch_layout_task_with_sync_layout) {
+    enable_batch_layout_task_with_sync_layout_ =
+        enable_batch_layout_task_with_sync_layout;
+  }
+  inline bool GetEnableBatchLayoutTaskWithSyncLayout() const {
+    return enable_batch_layout_task_with_sync_layout_;
+  }
+
+  inline void SetEnableiOSAnimationLayerForExposure(
+      bool enablei_os_animation_layer_for_exposure) {
+    enablei_os_animation_layer_for_exposure_ =
+        enablei_os_animation_layer_for_exposure;
+  }
+  inline bool GetEnableiOSAnimationLayerForExposure() const {
+    return enablei_os_animation_layer_for_exposure_;
+  }
+
+  inline void SetEnableFetchAPIStandardStreaming(
+      TernaryBool enable_fetch_api_standard_streaming) {
+    enable_fetch_api_standard_streaming_ = enable_fetch_api_standard_streaming;
+  }
+  inline TernaryBool GetEnableFetchAPIStandardStreaming() const {
+    return enable_fetch_api_standard_streaming_;
   }
 
   void DecodePageConfigFromJsonStringWhileUndefined(
@@ -892,7 +923,6 @@ class LynxConfig : public EntryConfig {
   TernaryBool enable_text_boring_layout_{TernaryBool::UNDEFINE_VALUE};
   TernaryBool enable_text_layer_render_{TernaryBool::UNDEFINE_VALUE};
   TernaryBool enable_use_map_buffer_{TernaryBool::UNDEFINE_VALUE};
-  TernaryBool enable_fiber_element_for_radon_diff_{TernaryBool::UNDEFINE_VALUE};
   TernaryBool enable_opt_push_style_to_bundle_{TernaryBool::UNDEFINE_VALUE};
   TernaryBool enable_text_layout_cache_{TernaryBool::UNDEFINE_VALUE};
   TernaryBool enable_unified_pipeline_{TernaryBool::UNDEFINE_VALUE};
@@ -993,7 +1023,12 @@ class LynxConfig : public EntryConfig {
   TernaryBool enable_text_gradient_opt_{TernaryBool::UNDEFINE_VALUE};
   bool enable_event_handle_refactor_{false};
   bool enable_reuse_load_script_exports_{false};
+  bool enable_mts_pre_execute_{false};
   bool enable_property_based_simple_style_{false};
+  bool enable_transformed_touch_position_{false};
+  bool enable_batch_layout_task_with_sync_layout_{false};
+  bool enablei_os_animation_layer_for_exposure_{false};
+  TernaryBool enable_fetch_api_standard_streaming_{TernaryBool::UNDEFINE_VALUE};
   /**
    * Not a config but a marker to indicate whether the page config needs to be
    * posted to platform layer. In PreDecode, PageConfig will be set to platform

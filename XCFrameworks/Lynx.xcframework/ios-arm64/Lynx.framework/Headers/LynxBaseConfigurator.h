@@ -20,7 +20,13 @@
  @protected
   LynxThreadStrategyForRender _threadStrategy;
   BOOL _hasThreadStrategySet;
+  LynxConfig* _config;
   BOOL _hasPendingJsTaskSet;
+
+  LynxBooleanOption _enableGenericResourceFetcher;
+  id<LynxGenericResourceFetcher> _genericResourceFetcher;
+  id<LynxMediaResourceFetcher> _mediaResourceFetcher;
+  id<LynxTemplateResourceFetcher> _templateResourceFetcher;
 }
 
 @property(nonatomic, nullable) LynxConfig* config;
@@ -48,6 +54,8 @@
 @property(nonatomic, nonnull) id<LynxGenericResourceFetcher> genericResourceFetcher;
 @property(nonatomic, nonnull) id<LynxMediaResourceFetcher> mediaResourceFetcher;
 @property(nonatomic, nonnull) id<LynxTemplateResourceFetcher> templateResourceFetcher;
+// enable LynxMediaResourceFetcher::fetchUIImage
+@property(nonatomic, assign) BOOL enableFetchUIImage;
 
 /**
  * You can set a virtual screen size to lynxview by this way.
@@ -87,6 +95,11 @@
  * DO NOT USE IT !!!
  */
 @property(nonatomic, assign) BOOL enableUnifiedPipeline;
+
+/**
+ * Enable SharedModule In LynxViewGroup
+ */
+@property(nonatomic, assign) BOOL enableSharedModule;
 
 /** Only when enableBytecode is YES, it will take effect.
  * Set bytecode key for current lynxview.

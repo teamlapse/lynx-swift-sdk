@@ -1,8 +1,8 @@
 // Copyright 2019 The Lynx Authors. All rights reserved.
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
-#ifndef CORE_RUNTIME_VM_LEPUS_GUARD_H_
-#define CORE_RUNTIME_VM_LEPUS_GUARD_H_
+#ifndef CORE_RUNTIME_LEPUS_GUARD_H_
+#define CORE_RUNTIME_LEPUS_GUARD_H_
 
 namespace lynx {
 namespace lepus {
@@ -27,4 +27,4 @@ class Guard {
 }  // namespace lepus
 }  // namespace lynx
 
-#endif  // CORE_RUNTIME_VM_LEPUS_GUARD_H_
+#endif  // CORE_RUNTIME_LEPUS_GUARD_H_

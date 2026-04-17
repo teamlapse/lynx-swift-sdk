@@ -2,8 +2,8 @@
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
 
-#ifndef CORE_RUNTIME_JSCACHE_JS_CACHE_MANAGER_H_
-#define CORE_RUNTIME_JSCACHE_JS_CACHE_MANAGER_H_
+#ifndef CORE_RUNTIME_JS_BYTECODE_JS_CACHE_MANAGER_H_
+#define CORE_RUNTIME_JS_BYTECODE_JS_CACHE_MANAGER_H_
 
 #include <stdint.h>
 
@@ -26,10 +26,10 @@
 
 #include "base/include/closure.h"
 #include "core/public/page_options.h"
-#include "core/runtime/jscache/cache_generator.h"
-#include "core/runtime/jscache/js_cache_tracker.h"
-#include "core/runtime/jscache/meta_data.h"
-#include "core/runtime/jsi/jsi.h"
+#include "core/runtime/js/bytecode/cache_generator.h"
+#include "core/runtime/js/bytecode/js_cache_tracker.h"
+#include "core/runtime/js/bytecode/meta_data.h"
+#include "core/runtime/js/jsi/jsi.h"
 
 namespace lynx {
 namespace piper {
@@ -275,4 +275,4 @@ UNITTEST_PUBLIC:
 }  // namespace piper
 }  // namespace lynx
 
-#endif  // CORE_RUNTIME_JSCACHE_JS_CACHE_MANAGER_H_
+#endif  // CORE_RUNTIME_JS_BYTECODE_JS_CACHE_MANAGER_H_

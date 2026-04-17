@@ -2,15 +2,15 @@
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
 
-#ifndef CORE_RUNTIME_BINDINGS_COMMON_MODULES_LYNX_NATIVE_MODULE_MANAGER_H_
-#define CORE_RUNTIME_BINDINGS_COMMON_MODULES_LYNX_NATIVE_MODULE_MANAGER_H_
+#ifndef CORE_RUNTIME_COMMON_BINDINGS_MODULES_LYNX_NATIVE_MODULE_MANAGER_H_
+#define CORE_RUNTIME_COMMON_BINDINGS_MODULES_LYNX_NATIVE_MODULE_MANAGER_H_
 
 #include <memory>
 #include <string>
 #include <utility>
 
 #include "core/public/jsb/native_module_factory.h"
-#include "core/runtime/bindings/jsi/modules/module_delegate.h"
+#include "core/runtime/js/bindings/modules/module_delegate.h"
 
 namespace lynx {
 namespace shell {
@@ -85,6 +85,7 @@ class LynxNativeModuleManager {
   void SetFacadeActor(
       const std::shared_ptr<shell::LynxActor<shell::NativeFacade>>
           &facade_actor);
+  void SetContextID(int64_t context_id) { context_id_ = context_id; };
 
  protected:
   const std::shared_ptr<shell::LynxActor<shell::LynxEngine>> &GetEngineActor() {
@@ -94,8 +95,13 @@ class LynxNativeModuleManager {
   GetFacadeActor() {
     return facade_actor_;
   }
+  int64_t GetContextID() { return context_id_; };
 
  private:
+  // The `context_id_` is used to associate with `LynxContext`, which is linked
+  // to the corresponding `Context` through `findContext` in
+  // `LynxModuleWrapper`.
+  int64_t context_id_ = -1;
   // Managed by LynxNativeModuleManager
   base::InlineVector<std::unique_ptr<piper::NativeModuleFactory>, 4>
       module_factories_;
@@ -114,4 +120,4 @@ class LynxNativeModuleManager {
 
 }  // namespace lynx
 
-#endif  // CORE_RUNTIME_BINDINGS_COMMON_MODULES_LYNX_NATIVE_MODULE_MANAGER_H_
+#endif  // CORE_RUNTIME_COMMON_BINDINGS_MODULES_LYNX_NATIVE_MODULE_MANAGER_H_

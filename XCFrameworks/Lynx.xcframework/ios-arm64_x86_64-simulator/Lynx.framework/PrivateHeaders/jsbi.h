@@ -2,15 +2,15 @@
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
 
-#ifndef CORE_RUNTIME_BINDINGS_JSI_BIG_INT_JSBI_H_
-#define CORE_RUNTIME_BINDINGS_JSI_BIG_INT_JSBI_H_
+#ifndef CORE_RUNTIME_JS_BINDINGS_BIG_INT_JSBI_H_
+#define CORE_RUNTIME_JS_BINDINGS_BIG_INT_JSBI_H_
 
 #include <string>
 #include <vector>
 
 #include "core/base/js_constants.h"
-#include "core/runtime/bindings/jsi/big_int/big_integer.h"
-#include "core/runtime/jsi/jsi.h"
+#include "core/runtime/js/bindings/big_int/big_integer.h"
+#include "core/runtime/js/jsi/jsi.h"
 
 namespace lynx {
 namespace piper {
@@ -32,4 +32,4 @@ class JSBI : public HostObject {
 
 }  // namespace piper
 }  // namespace lynx
-#endif  // CORE_RUNTIME_BINDINGS_JSI_BIG_INT_JSBI_H_
+#endif  // CORE_RUNTIME_JS_BINDINGS_BIG_INT_JSBI_H_

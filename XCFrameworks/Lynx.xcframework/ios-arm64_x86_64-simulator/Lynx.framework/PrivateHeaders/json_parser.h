@@ -2,8 +2,8 @@
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
 
-#ifndef CORE_RUNTIME_VM_LEPUS_JSON_PARSER_H_
-#define CORE_RUNTIME_VM_LEPUS_JSON_PARSER_H_
+#ifndef CORE_RUNTIME_LEPUS_JSON_PARSER_H_
+#define CORE_RUNTIME_LEPUS_JSON_PARSER_H_
 
 #include <memory>
 #include <set>
@@ -13,7 +13,7 @@
 
 #include "base/include/value/base_value.h"
 #include "core/base/lynx_export.h"
-#include "core/runtime/vm/lepus/vm_context.h"
+#include "core/runtime/lepus/vm_context.h"
 #include "third_party/rapidjson/document.h"
 #include "third_party/rapidjson/error/en.h"
 #include "third_party/rapidjson/reader.h"
@@ -68,4 +68,4 @@ void qjsObjectToJSONString(std::stringstream& ss, const lepus::Value& value,
 }  // namespace lepus
 }  // namespace lynx
 
-#endif  // CORE_RUNTIME_VM_LEPUS_JSON_PARSER_H_
+#endif  // CORE_RUNTIME_LEPUS_JSON_PARSER_H_

@@ -2,8 +2,8 @@
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
 
-#ifndef CORE_RUNTIME_BINDINGS_LEPUS_MODULES_LYNX_LEPUS_MODULE_H_
-#define CORE_RUNTIME_BINDINGS_LEPUS_MODULES_LYNX_LEPUS_MODULE_H_
+#ifndef CORE_RUNTIME_LEPUS_BINDINGS_MODULES_LYNX_LEPUS_MODULE_H_
+#define CORE_RUNTIME_LEPUS_BINDINGS_MODULES_LYNX_LEPUS_MODULE_H_
 #include <memory>
 #include <string>
 #include <utility>
@@ -62,4 +62,4 @@ class LynxLepusModule : public lepus::RefCounted {
 }  // namespace lepus
 }  // namespace lynx
 
-#endif  // CORE_RUNTIME_BINDINGS_LEPUS_MODULES_LYNX_LEPUS_MODULE_H_
+#endif  // CORE_RUNTIME_LEPUS_BINDINGS_MODULES_LYNX_LEPUS_MODULE_H_

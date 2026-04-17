@@ -1,8 +1,8 @@
 // Copyright 2023 The Lynx Authors. All rights reserved.
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
-#ifndef CORE_RUNTIME_BINDINGS_JSI_API_CALL_BACK_H_
-#define CORE_RUNTIME_BINDINGS_JSI_API_CALL_BACK_H_
+#ifndef CORE_RUNTIME_JS_BINDINGS_API_CALL_BACK_H_
+#define CORE_RUNTIME_JS_BINDINGS_API_CALL_BACK_H_
 
 #include <memory>
 #include <unordered_map>
@@ -10,13 +10,10 @@
 #include "base/include/log/logging.h"
 #include "base/trace/native/trace_event.h"
 #include "core/runtime/common/utils.h"
-#include "core/runtime/jsi/jsi.h"
+#include "core/runtime/js/jsi/jsi.h"
 #include "third_party/rapidjson/document.h"
 
 namespace lynx {
-namespace runtime {
-class LynxRuntime;
-}
 namespace piper {
 class Runtime;
 
@@ -77,6 +74,6 @@ class CallBackHolder : public std::enable_shared_from_this<CallBackHolder> {
 }  // namespace piper
 }  // namespace lynx
 
-#include "core/runtime/bindings/jsi/api_call_back-inl.h"
+#include "core/runtime/js/bindings/api_call_back-inl.h"
 
-#endif  // CORE_RUNTIME_BINDINGS_JSI_API_CALL_BACK_H_
+#endif  // CORE_RUNTIME_JS_BINDINGS_API_CALL_BACK_H_

@@ -7,8 +7,8 @@
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
 
-#ifndef CORE_RUNTIME_JSI_JSC_JSC_RUNTIME_H_
-#define CORE_RUNTIME_JSI_JSC_JSC_RUNTIME_H_
+#ifndef CORE_RUNTIME_JS_JSI_JSC_JSC_RUNTIME_H_
+#define CORE_RUNTIME_JS_JSI_JSC_JSC_RUNTIME_H_
 
 #include <JavaScriptCore/JavaScript.h>
 
@@ -18,11 +18,11 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include "core/runtime/jsi/jsc/jsc_context_group_wrapper.h"
-#include "core/runtime/jsi/jsc/jsc_context_wrapper.h"
-#include "core/runtime/jsi/jsc/jsc_helper.h"
-#include "core/runtime/jsi/jsi.h"
-#include "core/runtime/jsi/jslib.h"
+#include "core/runtime/js/jsi/jsc/jsc_context_group_wrapper.h"
+#include "core/runtime/js/jsi/jsc/jsc_context_wrapper.h"
+#include "core/runtime/js/jsi/jsc/jsc_helper.h"
+#include "core/runtime/js/jsi/jsi.h"
+#include "core/runtime/js/jsi/jslib.h"
 
 namespace lynx {
 namespace piper {
@@ -213,4 +213,4 @@ class JSCRuntime : public Runtime {
 
 }  // namespace piper
 }  // namespace lynx
-#endif  // CORE_RUNTIME_JSI_JSC_JSC_RUNTIME_H_
+#endif  // CORE_RUNTIME_JS_JSI_JSC_JSC_RUNTIME_H_

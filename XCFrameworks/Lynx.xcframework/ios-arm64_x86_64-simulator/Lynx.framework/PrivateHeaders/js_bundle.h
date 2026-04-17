@@ -2,8 +2,8 @@
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
 
-#ifndef CORE_RUNTIME_PIPER_JS_JS_BUNDLE_H_
-#define CORE_RUNTIME_PIPER_JS_JS_BUNDLE_H_
+#ifndef CORE_RUNTIME_JS_JS_BUNDLE_H_
+#define CORE_RUNTIME_JS_JS_BUNDLE_H_
 
 #include <functional>
 #include <memory>
@@ -12,7 +12,7 @@
 #include <unordered_map>
 #include <utility>
 
-#include "core/runtime/jsi/jsi.h"
+#include "core/runtime/js/jsi/jsi.h"
 
 namespace lynx::piper {
 // A `JsContent` represents content of a js file, either source code or
@@ -30,17 +30,22 @@ class JsContent {
   JsContent(std::string buffer, Type type)
       : buffer_(std::make_shared<StringBuffer>(std::move(buffer))),
         type_(type) {}
+  JsContent(const char *buffer, Type type)
+      : buffer_(std::make_shared<StringBuffer>(std::string(buffer))),
+        type_(type) {}
+  JsContent(const base::String &buffer, Type type)
+      : buffer_(std::make_shared<BaseStringBuffer>(buffer)), type_(type) {}
 
-  std::shared_ptr<StringBuffer> GetBuffer() && { return std::move(buffer_); }
+  std::shared_ptr<Buffer> GetBuffer() && { return std::move(buffer_); }
 
-  const std::shared_ptr<StringBuffer> &GetBuffer() const & { return buffer_; }
+  const std::shared_ptr<Buffer> &GetBuffer() const & { return buffer_; }
 
   bool IsSourceCode() const { return type_ == Type::SOURCE; }
   bool IsByteCode() const { return type_ == Type::BYTECODE; }
   bool IsError() const { return type_ == Type::ERROR; }
 
  private:
-  std::shared_ptr<StringBuffer> buffer_;
+  std::shared_ptr<Buffer> buffer_;
   Type type_;
 };
 
@@ -59,4 +64,4 @@ class JsBundle {
 };
 }  // namespace lynx::piper
 
-#endif  // CORE_RUNTIME_PIPER_JS_JS_BUNDLE_H_
+#endif  // CORE_RUNTIME_JS_JS_BUNDLE_H_

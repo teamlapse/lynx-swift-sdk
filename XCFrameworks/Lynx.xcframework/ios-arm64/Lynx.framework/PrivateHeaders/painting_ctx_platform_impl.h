@@ -5,6 +5,7 @@
 #ifndef CORE_PUBLIC_PAINTING_CTX_PLATFORM_IMPL_H_
 #define CORE_PUBLIC_PAINTING_CTX_PLATFORM_IMPL_H_
 
+#include <atomic>
 #include <memory>
 #include <string>
 #include <utility>
@@ -71,6 +72,8 @@ class PaintingCtxPlatformRef {
   virtual void SetNeedMarkPaintEndTiming(const tasm::PipelineID& pipeline_id) {}
 
   virtual void MarkUIOperationQueueFlushForRecreateEngine(bool enable) {}
+
+  virtual bool IsNativePaintingCtxPlatformRef() { return false; }
 };
 
 struct PaintingCtxPlatformImplConfig {
@@ -196,11 +199,25 @@ class PaintingCtxPlatformImpl {
     text_layout_impl_->Align(element);
   }
 
+  virtual void DestroyText(Element* element) {
+    if (text_layout_impl_) {
+      text_layout_impl_->Destroy(element);
+    }
+  }
+
   virtual NativePaintingContext* CastToNativeCtx() { return nullptr; }
 
   void MarkUIOperationQueueFlushForRecreateEngine(bool enable);
 
+  bool IsLayoutFinish() { return is_layout_finish_; }
+
+  void ResetLayoutStatus() { is_layout_finish_ = false; }
+
+  void MarkLayoutFinish() { is_layout_finish_ = true; }
+
  protected:
+  std::atomic<bool> is_layout_finish_ = {false};
+
   std::shared_ptr<PaintingCtxPlatformRef> platform_ref_;
   std::unique_ptr<TextLayoutImpl> text_layout_impl_;
   PaintingCtxPlatformImplConfig config_;

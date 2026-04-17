@@ -74,9 +74,8 @@ class Keyframe {
 
   virtual void NotifyUnitValuesUpdatedToAnimation(tasm::CSSValuePattern){};
 
-  virtual bool SetValue(
-      const std::pair<tasm::CSSPropertyID, tasm::CSSValue>& css_value_pair,
-      tasm::Element* element) = 0;
+  virtual bool SetValue(tasm::CSSPropertyID id, const tasm::CSSValue& value,
+                        tasm::Element* element) = 0;
 
  protected:
   bool is_empty_{true};
@@ -128,6 +127,7 @@ class AnimationCurve {
     FILTER = tasm::kPropertyIDFilter,
     OFFSET_DISTANCE = tasm::kPropertyIDOffsetDistance,
     BACKGROUND_POSITION = tasm::kPropertyIDBackgroundPosition,
+    TRANSFORM_ORIGIN = tasm::kPropertyIDTransformOrigin,
   };
 
   virtual ~AnimationCurve() = default;
@@ -210,6 +210,14 @@ class FilterAnimationCurve : public AnimationCurve {
 class BackgroundPositionAnimationCurve : public AnimationCurve {
  public:
   ~BackgroundPositionAnimationCurve() override = default;
+
+  std::unique_ptr<Keyframe> MakeEmptyKeyframe(
+      const fml::TimeDelta& offset) override;
+};
+
+class TransformOriginAnimationCurve : public AnimationCurve {
+ public:
+  ~TransformOriginAnimationCurve() override = default;
 
   std::unique_ptr<Keyframe> MakeEmptyKeyframe(
       const fml::TimeDelta& offset) override;

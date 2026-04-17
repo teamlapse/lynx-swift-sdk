@@ -1,8 +1,8 @@
 // Copyright 2023 The Lynx Authors. All rights reserved.
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
-#ifndef CORE_RUNTIME_PIPER_JS_RUNTIME_MANAGER_H_
-#define CORE_RUNTIME_PIPER_JS_RUNTIME_MANAGER_H_
+#ifndef CORE_RUNTIME_JS_RUNTIME_MANAGER_H_
+#define CORE_RUNTIME_JS_RUNTIME_MANAGER_H_
 
 #include <memory>
 #include <mutex>
@@ -14,8 +14,8 @@
 #include "base/include/closure.h"
 #include "core/base/lynx_export.h"
 #include "core/public/page_options.h"
-#include "core/runtime/jsi/jsi.h"
-#include "core/runtime/piper/js/js_context_wrapper.h"
+#include "core/runtime/js/js_context_wrapper.h"
+#include "core/runtime/js/jsi/jsi.h"
 
 namespace lynx {
 
@@ -74,7 +74,7 @@ class LYNX_EXPORT_FOR_DEVTOOL RuntimeManager
 
   ~RuntimeManager() override;
 
-  bool IsSingleJSContext(const std::string& group_id);
+  static bool IsSingleJSContext(const std::string& group_id);
 
   std::shared_ptr<piper::Runtime> CreateJSRuntime(
       const std::string& group_id,
@@ -98,6 +98,8 @@ class LYNX_EXPORT_FOR_DEVTOOL RuntimeManager
       std::unique_ptr<RuntimeManagerDelegate> runtime_manager_delegate) {
     runtime_manager_delegate_ = std::move(runtime_manager_delegate);
   }
+
+  JSContextWrapper* GetContextWrapper(const std::string& group_id);
 
  private:
   RuntimeManager() = default;
@@ -145,4 +147,4 @@ class LYNX_EXPORT_FOR_DEVTOOL RuntimeManager
 
 }  // namespace runtime
 }  // namespace lynx
-#endif  // CORE_RUNTIME_PIPER_JS_RUNTIME_MANAGER_H_
+#endif  // CORE_RUNTIME_JS_RUNTIME_MANAGER_H_

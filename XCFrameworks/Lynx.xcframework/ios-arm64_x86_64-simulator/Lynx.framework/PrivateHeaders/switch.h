@@ -1,8 +1,8 @@
 // Copyright 2019 The Lynx Authors. All rights reserved.
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
-#ifndef CORE_RUNTIME_VM_LEPUS_SWITCH_H_
-#define CORE_RUNTIME_VM_LEPUS_SWITCH_H_
+#ifndef CORE_RUNTIME_LEPUS_SWITCH_H_
+#define CORE_RUNTIME_LEPUS_SWITCH_H_
 
 #include <algorithm>
 #include <climits>
@@ -10,7 +10,8 @@
 #include <utility>
 #include <vector>
 
-#include "core/runtime/vm/lepus/token.h"
+#include "core/runtime/lepus/restricted_value.h"
+#include "core/runtime/lepus/token.h"
 
 namespace lynx {
 namespace lepus {
@@ -19,7 +20,6 @@ enum SwitchType {
   SwitchType_Lookup,
 };
 
-class Value;
 class SwitchInfo {
  public:
   SwitchInfo()
@@ -44,7 +44,7 @@ class SwitchInfo {
   static bool SortTable(const std::pair<int, int>& v1,
                         const std::pair<int, int>& v2);
   void Adjust();
-  long Switch(Value* value);
+  long Switch(RestrictedValue* value);
 
   long default_offset() const { return default_offset_; }
 
@@ -75,4 +75,4 @@ class SwitchInfo {
 }  // namespace lepus
 }  // namespace lynx
 
-#endif  // CORE_RUNTIME_VM_LEPUS_SWITCH_H_
+#endif  // CORE_RUNTIME_LEPUS_SWITCH_H_

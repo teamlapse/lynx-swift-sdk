@@ -13,11 +13,11 @@
 
 #include "base/include/log/logging.h"
 
-#define NLIST_LOGD(msg) LOGD("[List] " << msg)
-#define NLIST_LOGV(msg) LOGV("[List] " << msg)
-#define NLIST_LOGI(msg) LOGI("[List] " << msg)
-#define NLIST_LOGW(msg) LOGW("[List] " << msg)
-#define NLIST_LOGE(msg) LOGE("[List] " << msg)
+#define NLIST_LOGD(msg) LOGD("[InternalList] " << msg)
+#define NLIST_LOGV(msg) LOGV("[InternalList] " << msg)
+#define NLIST_LOGI(msg) LOGI("[InternalList] " << msg)
+#define NLIST_LOGW(msg) LOGW("[InternalList] " << msg)
+#define NLIST_LOGE(msg) LOGE("[InternalList] " << msg)
 
 namespace lynx {
 namespace tasm {
@@ -71,6 +71,8 @@ static constexpr const char* const kLowerThresholdItemCount =
     "lower-threshold-item-count";
 static constexpr const char* const kUpperThresholdItemCount =
     "upper-threshold-item-count";
+static constexpr const char* const kExperimentalSearchRefAnchorStrategy =
+    "experimental-search-ref-anchor-strategy";
 static constexpr const char* const kScrollEventThrottle =
     "scroll-event-throttle";
 static constexpr const char kExperimentalBatchRenderStrategy[] =
@@ -292,6 +294,13 @@ enum class ScrollState {
   kDragging,
   kFling,
   kScrollAnimation
+};
+
+// Search ref anchor strategy
+enum class SearchRefAnchorStrategy {
+  kNone = 0,
+  kToStart,
+  kToEnd,
 };
 
 enum class ItemHolderAnimationType { kNone, kTransform, kOpacity };

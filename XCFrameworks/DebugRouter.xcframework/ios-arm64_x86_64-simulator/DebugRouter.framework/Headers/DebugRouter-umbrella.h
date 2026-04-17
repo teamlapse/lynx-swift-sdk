@@ -24,7 +24,6 @@
 #import "DebugRouterService.h"
 #import "DebugRouterServiceProtocol.h"
 #import "LocalNetworkPermissionChecker.h"
-#import "debug_router_export.h"
 
 FOUNDATION_EXPORT double DebugRouterVersionNumber;
 FOUNDATION_EXPORT const unsigned char DebugRouterVersionString[];

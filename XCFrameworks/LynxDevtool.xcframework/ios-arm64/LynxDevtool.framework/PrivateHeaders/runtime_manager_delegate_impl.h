@@ -5,7 +5,7 @@
 #ifndef DEVTOOL_LYNX_DEVTOOL_JS_DEBUG_JS_RUNTIME_MANAGER_DELEGATE_IMPL_H_
 #define DEVTOOL_LYNX_DEVTOOL_JS_DEBUG_JS_RUNTIME_MANAGER_DELEGATE_IMPL_H_
 
-#include "core/runtime/piper/js/runtime_manager.h"
+#include "core/runtime/js/runtime_manager.h"
 
 namespace lynx {
 namespace devtool {
@@ -26,7 +26,7 @@ class RuntimeManagerDelegateImpl : public runtime::RuntimeManagerDelegate {
       bool force_use_lightweight_js_engine, bool use_shared_context = false,
       const tasm::PageOptions& page_options = tasm::PageOptions()) override;
 #if ENABLE_TRACE_PERFETTO
-  std::shared_ptr<profile::RuntimeProfiler> MakeRuntimeProfiler(
+  std::shared_ptr<runtime::profile::RuntimeProfiler> MakeRuntimeProfiler(
       std::shared_ptr<piper::JSIContext> js_context,
       bool force_use_lightweight_js_engine,
       const tasm::PageOptions& page_options) override;

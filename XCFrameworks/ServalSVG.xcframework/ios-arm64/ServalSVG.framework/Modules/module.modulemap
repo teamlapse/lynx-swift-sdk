@@ -1,0 +1,6 @@
+framework module ServalSVG {
+  umbrella header "ServalSVG-umbrella.h"
+
+  export *
+  module * { export * }
+}

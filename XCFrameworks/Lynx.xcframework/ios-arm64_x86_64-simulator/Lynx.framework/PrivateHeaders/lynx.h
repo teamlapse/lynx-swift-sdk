@@ -2,14 +2,14 @@
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
 
-#ifndef CORE_RUNTIME_BINDINGS_JSI_LYNX_H_
-#define CORE_RUNTIME_BINDINGS_JSI_LYNX_H_
+#ifndef CORE_RUNTIME_JS_BINDINGS_LYNX_H_
+#define CORE_RUNTIME_JS_BINDINGS_LYNX_H_
 
 #include <memory>
 #include <vector>
 
-#include "core/runtime/bindings/jsi/js_app.h"
-#include "core/runtime/jsi/jsi.h"
+#include "core/runtime/js/bindings/js_app.h"
+#include "core/runtime/js/jsi/jsi.h"
 
 namespace lynx {
 namespace piper {
@@ -33,4 +33,4 @@ class LynxProxy : public HostObject {
 };
 }  // namespace piper
 }  // namespace lynx
-#endif  // CORE_RUNTIME_BINDINGS_JSI_LYNX_H_
+#endif  // CORE_RUNTIME_JS_BINDINGS_LYNX_H_

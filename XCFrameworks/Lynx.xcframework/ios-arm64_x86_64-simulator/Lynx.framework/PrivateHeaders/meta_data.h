@@ -2,8 +2,8 @@
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
 
-#ifndef CORE_RUNTIME_JSCACHE_META_DATA_H_
-#define CORE_RUNTIME_JSCACHE_META_DATA_H_
+#ifndef CORE_RUNTIME_JS_BYTECODE_META_DATA_H_
+#define CORE_RUNTIME_JS_BYTECODE_META_DATA_H_
 
 #include <functional>
 #include <memory>
@@ -107,4 +107,4 @@ class MetaData {
 }  // namespace piper
 }  // namespace lynx
 
-#endif  // CORE_RUNTIME_JSCACHE_META_DATA_H_
+#endif  // CORE_RUNTIME_JS_BYTECODE_META_DATA_H_

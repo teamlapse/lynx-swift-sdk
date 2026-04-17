@@ -25,6 +25,7 @@
 #include "core/renderer/data/template_data.h"
 #include "core/renderer/element_manager_delegate_impl.h"
 #include "core/renderer/events/touch_event_handler.h"
+#include "core/renderer/layout_scheduler/layout_scheduler.h"
 #include "core/renderer/page_proxy.h"
 #include "core/renderer/pipeline/pipeline_context_manager.h"
 #include "core/renderer/pipeline/pipeline_layout_data.h"
@@ -34,13 +35,13 @@
 #include "core/renderer/template_entry_holder.h"
 #include "core/renderer/template_themed.h"
 #include "core/renderer/ui_wrapper/layout/list_node.h"
-#include "core/runtime/bindings/common/resource/response_promise.h"
-#include "core/runtime/bindings/lepus/event/context_proxy_in_lepus.h"
-#include "core/runtime/bindings/lepus/modules/lynx_lepus_module_manager.h"
-#include "core/runtime/piper/js/template_delegate.h"
-#include "core/runtime/piper/js/update_data_type.h"
-#include "core/runtime/vm/lepus/lepus_global.h"
-#include "core/runtime/vm/lepus/vm_context.h"
+#include "core/runtime/common/bindings/resource/response_promise.h"
+#include "core/runtime/js/template_delegate.h"
+#include "core/runtime/js/update_data_type.h"
+#include "core/runtime/lepus/bindings/event/context_proxy_in_lepus.h"
+#include "core/runtime/lepus/bindings/modules/lynx_lepus_module_manager.h"
+#include "core/runtime/lepus/lepus_global.h"
+#include "core/runtime/lepus/vm_context.h"
 #include "core/services/timing_handler/timing.h"
 #include "core/template_bundle/lynx_template_bundle.h"
 #include "core/template_bundle/template_codec/binary_decoder/page_config.h"
@@ -252,18 +253,9 @@ class TemplateAssembler final : public TemplateEntryHolder,
     bool scoped_ = false;
   };
 
-  class LayoutScheduler {
-   public:
-    LayoutScheduler() = default;
-    virtual ~LayoutScheduler() = default;
-
-    virtual void RequestLayout(
-        const std::shared_ptr<tasm::PipelineOptions>& options) = 0;
-  };
-
   TemplateAssembler(Delegate& delegate, std::unique_ptr<ElementManager> client,
-                    LayoutScheduler& layout_scheduler, int32_t instance_id,
-                    bool enable_unified_pipeline = false,
+                    LayoutScheduler::LayoutSchedulerImpl* layout_scheduler,
+                    int32_t instance_id, bool enable_unified_pipeline = false,
                     const PageOptions& page_options = PageOptions());
   ~TemplateAssembler() override;
 
@@ -819,7 +811,11 @@ class TemplateAssembler final : public TemplateEntryHolder,
   bool IsEmbeddedModeOn() const { return page_options_.IsEmbeddedModeOn(); }
 
   bool EnableEventHandleRefactor() const {
-    return page_config_ ? page_config_->GetEnableEventHandleRefactor() : false;
+    return page_config_
+               ? (page_config_->GetEnableEventHandleRefactor() ||
+                  IsEmbeddedModeOn() ||
+                  page_proxy_.element_manager()->IsFragmentLayerRenderModeOn())
+               : false;
   }
 
  private:
@@ -983,7 +979,7 @@ class TemplateAssembler final : public TemplateEntryHolder,
 
   std::string target_sdk_version_;
   Delegate& delegate_;
-  LayoutScheduler& layout_scheduler_;
+  std::unique_ptr<LayoutScheduler> layout_scheduler_;
   I18n i18n;
 
   std::unique_ptr<TouchEventHandler> touch_event_handler_;

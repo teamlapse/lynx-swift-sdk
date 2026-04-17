@@ -2,16 +2,16 @@
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
 
-#ifndef CORE_RUNTIME_BINDINGS_JSI_MODULES_LYNX_JSI_MODULE_BINDING_H_
-#define CORE_RUNTIME_BINDINGS_JSI_MODULES_LYNX_JSI_MODULE_BINDING_H_
+#ifndef CORE_RUNTIME_JS_BINDINGS_MODULES_LYNX_JSI_MODULE_BINDING_H_
+#define CORE_RUNTIME_JS_BINDINGS_MODULES_LYNX_JSI_MODULE_BINDING_H_
 
 #include <memory>
 #include <string>
 #include <vector>
 
 #include "base/include/vector.h"
-#include "core/runtime/bindings/jsi/modules/lynx_module.h"
-#include "core/runtime/jsi/jsi.h"
+#include "core/runtime/js/bindings/modules/lynx_module.h"
+#include "core/runtime/js/jsi/jsi.h"
 
 namespace lynx {
 namespace piper {
@@ -35,4 +35,4 @@ class LynxJSIModuleBinding : public piper::HostObject {
 }  // namespace piper
 }  // namespace lynx
 
-#endif  // CORE_RUNTIME_BINDINGS_JSI_MODULES_LYNX_JSI_MODULE_BINDING_H_
+#endif  // CORE_RUNTIME_JS_BINDINGS_MODULES_LYNX_JSI_MODULE_BINDING_H_

@@ -10,6 +10,7 @@
 #include <cstdint>
 #include <memory>
 #include <mutex>
+#include <shared_mutex>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -127,6 +128,15 @@ class DebugRouterCore : public MessageTransceiverDelegate {
   void AddStateListener(
       const std::shared_ptr<core::DebugRouterStateListener> &listener);
 
+  // these two methods are conflictive, only one of them can be enabled
+  void EnableAllSessions();
+  // for online debug, could only debug needed sessions, work with
+  // enabled_session_ids_
+  void EnableSingleSession(int32_t session_id);
+
+  bool isActiveSession(int32_t session_id);
+  bool isEnableAllSessions();
+
   DebugRouterCore(const DebugRouterCore &) = delete;
   DebugRouterCore &operator=(const DebugRouterCore &) = delete;
   DebugRouterCore(DebugRouterCore &&) = delete;
@@ -135,8 +145,8 @@ class DebugRouterCore : public MessageTransceiverDelegate {
   virtual ~DebugRouterCore();
 
  protected:
-  std::recursive_mutex slots_mutex_;
-  std::recursive_mutex state_listeners_mutex_;
+  std::shared_mutex slots_mutex_;
+  std::shared_mutex state_listeners_mutex_;
   friend class MessageHandlerCore;
   std::unordered_map<int32_t, std::shared_ptr<core::NativeSlot> > slots_;
   std::string room_id_;
@@ -171,6 +181,10 @@ class DebugRouterCore : public MessageTransceiverDelegate {
   std::atomic<int32_t> usb_port_;
   std::atomic<int> handler_count_;
   std::atomic<WebSocketConnectType> is_first_connect_;
+
+  std::atomic<bool> enable_all_sessions_{false};
+  std::unordered_set<int32_t> enabled_session_ids_;
+  std::shared_mutex enabled_sessions_mutex_;
 };
 
 }  // namespace core

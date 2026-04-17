@@ -1,34 +1,35 @@
 // Copyright 2020 The Lynx Authors. All rights reserved.
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
-#ifndef CORE_RUNTIME_VM_LEPUS_JSON_API_H_
-#define CORE_RUNTIME_VM_LEPUS_JSON_API_H_
+#ifndef CORE_RUNTIME_LEPUS_JSON_API_H_
+#define CORE_RUNTIME_LEPUS_JSON_API_H_
 
 #include <string>
 #include <utility>
 
-#include "core/runtime/vm/lepus/json_parser.h"
+#include "core/runtime/lepus/json_parser.h"
+#include "core/runtime/lepus/restricted_value.h"
 
 namespace lynx {
 namespace lepus {
-Value Stringify(VMContext* context) {
+RestrictedValue Stringify(VMContext* context) {
   long params_count = context->GetParamsSize();
   DCHECK(params_count == 1);
-  Value* arg = context->GetParam(0);
+  auto* arg = context->GetParam(0);
   if (arg->IsString()) {
-    return Value(arg->String());
+    return RestrictedValue(arg->String());
   } else if (arg->IsNil() || arg->IsUndefined()) {
     BASE_STATIC_STRING_DECL(kNull, "null");
-    return Value(kNull);
+    return RestrictedValue(kNull);
   }
   DCHECK(arg->IsTable() || arg->IsArray());
-  return Value(lepusValueToJSONString(*arg));
+  return RestrictedValue(lepusValueToJSONString(Value(*arg)));
 }
 
-Value Parse(VMContext* context) {
+RestrictedValue Parse(VMContext* context) {
   long params_count = context->GetParamsSize();
   DCHECK(params_count == 1);
-  Value* arg = context->GetParam(0);
+  auto* arg = context->GetParam(0);
   Value res;
   if (arg->IsString()) {
     res = jsonValueTolepusValue(arg->CString());
@@ -36,7 +37,7 @@ Value Parse(VMContext* context) {
     // other type
     res = jsonValueTolepusValue("");
   }
-  return res;
+  return RestrictedValue(res);
 }
 
 void RegisterJSONAPI(Context* ctx) {
@@ -49,4 +50,4 @@ void RegisterJSONAPI(Context* ctx) {
 }
 }  // namespace lepus
 }  // namespace lynx
-#endif  // CORE_RUNTIME_VM_LEPUS_JSON_API_H_
+#endif  // CORE_RUNTIME_LEPUS_JSON_API_H_

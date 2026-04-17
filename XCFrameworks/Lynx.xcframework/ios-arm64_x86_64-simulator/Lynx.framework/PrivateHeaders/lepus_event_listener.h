@@ -2,13 +2,13 @@
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
 
-#ifndef CORE_RUNTIME_BINDINGS_LEPUS_EVENT_LEPUS_EVENT_LISTENER_H_
-#define CORE_RUNTIME_BINDINGS_LEPUS_EVENT_LEPUS_EVENT_LISTENER_H_
+#ifndef CORE_RUNTIME_LEPUS_BINDINGS_EVENT_LEPUS_EVENT_LISTENER_H_
+#define CORE_RUNTIME_LEPUS_BINDINGS_EVENT_LEPUS_EVENT_LISTENER_H_
 
 #include "base/include/value/base_value.h"
 #include "core/event/event.h"
 #include "core/event/event_listener.h"
-#include "core/runtime/vm/lepus/context.h"
+#include "core/runtime/lepus/context.h"
 
 namespace lynx {
 namespace tasm {
@@ -34,4 +34,4 @@ class LepusClosureEventListener : public event::EventListener {
 }  // namespace tasm
 }  // namespace lynx
 
-#endif  // CORE_RUNTIME_BINDINGS_LEPUS_EVENT_LEPUS_EVENT_LISTENER_H_
+#endif  // CORE_RUNTIME_LEPUS_BINDINGS_EVENT_LEPUS_EVENT_LISTENER_H_

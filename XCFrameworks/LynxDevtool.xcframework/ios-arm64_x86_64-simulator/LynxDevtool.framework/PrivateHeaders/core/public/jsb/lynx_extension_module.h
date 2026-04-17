@@ -14,11 +14,6 @@
 #include "core/public/jsb/lynx_native_module.h"
 #include "core/public/ui_delegate.h"
 #include "core/public/vsync_observer_interface.h"
-#include "third_party/binding/napi/shim/shim_napi.h"
-
-#ifdef USE_PRIMJS_NAPI
-#include "third_party/napi/include/primjs_napi_defines.h"
-#endif
 
 namespace lynx {
 namespace piper {
@@ -30,9 +25,9 @@ class LynxExtensionModule : public LynxNativeModule {
   virtual void SetRuntimeInitState(
       const fml::RefPtr<fml::TaskRunner>& task_runner) = 0;
   virtual void SetRuntimeAttachedState(
-      napi_env env,
+      void* opaque_env,
       const std::shared_ptr<runtime::IVSyncObserver>& vsync_observer) = 0;
-  virtual void SetRuntimeReadyState(napi_env env, napi_value lynx,
+  virtual void SetRuntimeReadyState(void* opaque_env, void* opaque_lynx,
                                     const std::string& url) = 0;
   virtual void SetRuntimeDetachedState() = 0;
 
@@ -54,9 +49,5 @@ class LynxExtensionModule : public LynxNativeModule {
 
 }  // namespace piper
 }  // namespace lynx
-
-#ifdef USE_PRIMJS_NAPI
-#include "third_party/napi/include/primjs_napi_undefs.h"
-#endif
 
 #endif  // CORE_PUBLIC_JSB_LYNX_EXTENSION_MODULE_H_

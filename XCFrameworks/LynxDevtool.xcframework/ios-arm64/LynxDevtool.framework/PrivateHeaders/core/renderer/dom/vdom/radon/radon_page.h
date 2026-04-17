@@ -11,7 +11,7 @@
 #include "core/renderer/css/css_fragment.h"
 #include "core/renderer/dom/vdom/radon/radon_component.h"
 #include "core/renderer/page_proxy.h"
-#include "core/runtime/vm/lepus/vm_context.h"
+#include "core/runtime/lepus/vm_context.h"
 #include "core/template_bundle/template_codec/moulds.h"
 
 namespace lynx {
@@ -39,8 +39,6 @@ class RadonPage : public RadonComponent {
   virtual void DispatchSelf(const DispatchOption &) override;
   virtual void Dispatch(const DispatchOption &) override;
   virtual void DispatchForDiff(const DispatchOption &) override;
-  // for remove component element
-  virtual bool NeedsElement() const override { return true; }
   virtual bool UpdateConfig(const lepus::Value &config, bool to_refresh,
                             std::shared_ptr<PipelineOptions> &pipeline_options);
   void UpdateSystemInfo(const lynx::lepus::Value &config);

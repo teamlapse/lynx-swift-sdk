@@ -7,10 +7,12 @@
 #if ENABLE_TRACE_PERFETTO
 #include <memory>
 
+#include "core/runtime/lepus/context.h"
+#include "core/runtime/lepusng/quick_context.h"
 #include "core/runtime/profile/runtime_profiler.h"
-#include "core/runtime/vm/lepus/context.h"
 
 namespace lynx {
+namespace runtime {
 namespace profile {
 
 class LepusNGProfiler : public RuntimeProfiler {
@@ -25,9 +27,10 @@ class LepusNGProfiler : public RuntimeProfiler {
   virtual trace::RuntimeProfilerType GetType() override;
 
  private:
-  std::weak_ptr<lepus::Context> weak_context_;
+  std::weak_ptr<lepus::QuickContext> weak_context_;
 };
 }  // namespace profile
+}  // namespace runtime
 }  // namespace lynx
 #endif
 #endif  // CORE_RUNTIME_PROFILE_LEPUSNG_LEPUSNG_PROFILER_H_

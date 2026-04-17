@@ -2,8 +2,8 @@
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
 
-#ifndef CORE_RUNTIME_BINDINGS_JSI_MODULES_LYNX_MODULE_MANAGER_H_
-#define CORE_RUNTIME_BINDINGS_JSI_MODULES_LYNX_MODULE_MANAGER_H_
+#ifndef CORE_RUNTIME_JS_BINDINGS_MODULES_LYNX_MODULE_MANAGER_H_
+#define CORE_RUNTIME_JS_BINDINGS_MODULES_LYNX_MODULE_MANAGER_H_
 
 #include <memory>
 #include <string>
@@ -16,11 +16,11 @@
 #include "base/include/vector.h"
 #include "core/public/jsb/native_module_factory.h"
 #include "core/public/lynx_runtime_proxy.h"
-#include "core/runtime/bindings/common/modules/lynx_native_module_manager.h"
-#include "core/runtime/bindings/jsi/modules/lynx_jsi_module_binding.h"
-#include "core/runtime/bindings/jsi/modules/lynx_module.h"
-#include "core/runtime/bindings/jsi/modules/module_delegate.h"
-#include "core/runtime/bindings/jsi/modules/module_interceptor.h"
+#include "core/runtime/common/bindings/modules/lynx_native_module_manager.h"
+#include "core/runtime/js/bindings/modules/lynx_jsi_module_binding.h"
+#include "core/runtime/js/bindings/modules/lynx_module.h"
+#include "core/runtime/js/bindings/modules/module_delegate.h"
+#include "core/runtime/js/bindings/modules/module_interceptor.h"
 
 namespace lynx {
 namespace piper {
@@ -52,6 +52,7 @@ class LynxModuleManager : public pub::LynxNativeModuleManager {
       pub::LynxNativeModuleManager &&native_module_manager)
       : pub::LynxNativeModuleManager(std::move(native_module_manager)) {
     delegate_ = pub::LynxNativeModuleManager::GetModuleDelegate();
+    context_id_ = pub::LynxNativeModuleManager::GetContextID();
     record_id_ = pub::LynxNativeModuleManager::record_id_;
   }
   virtual ~LynxModuleManager();
@@ -89,6 +90,7 @@ class LynxModuleManager : public pub::LynxNativeModuleManager {
       const std::string &name, const std::shared_ptr<ModuleDelegate> &delegate);
 
  private:
+  int64_t context_id_ = -1;
   LynxModuleProviderFunction BindingFunc(
       std::weak_ptr<LynxModuleManager> weak_manager,
       const std::shared_ptr<ModuleDelegate> &delegate);
@@ -102,4 +104,4 @@ class LynxModuleManager : public pub::LynxNativeModuleManager {
 }  // namespace piper
 }  // namespace lynx
 
-#endif  // CORE_RUNTIME_BINDINGS_JSI_MODULES_LYNX_MODULE_MANAGER_H_
+#endif  // CORE_RUNTIME_JS_BINDINGS_MODULES_LYNX_MODULE_MANAGER_H_

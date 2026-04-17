@@ -1,8 +1,8 @@
 // Copyright 2019 The Lynx Authors. All rights reserved.
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
-#ifndef CORE_RUNTIME_VM_LEPUS_QUICK_CONTEXT_H_
-#define CORE_RUNTIME_VM_LEPUS_QUICK_CONTEXT_H_
+#ifndef CORE_RUNTIME_LEPUSNG_QUICK_CONTEXT_H_
+#define CORE_RUNTIME_LEPUSNG_QUICK_CONTEXT_H_
 
 #include <memory>
 #include <string>
@@ -11,8 +11,8 @@
 
 #include "core/public/page_options.h"
 #include "core/runtime/common/js_error_reporter.h"
+#include "core/runtime/lepus/context.h"
 #include "core/runtime/profile/runtime_profiler.h"
-#include "core/runtime/vm/lepus/context.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,16 +33,23 @@ extern "C" {
 #include "quickjs/include/trace-gc.h"
 #endif
 
+struct LEPUSRuntime;
+struct LEPUSContext;
+
 namespace lynx {
 namespace lepus {
 
 class ContextBinaryWriter;
-using RenderBindingFunc = lepus::Value (*)(lepus::Context*, lepus::Value*,
-                                           int32_t);
 
-struct RenderBindingFunction {
-  const char* name;
-  RenderBindingFunc function;
+class LEPUSRuntimeData {
+ public:
+  LEPUSRuntimeData(bool disable_tracing_gc, int runtime_mode);
+  ~LEPUSRuntimeData();
+
+  LEPUSRuntime* runtime_;
+  LEPUSContext* lepus_context_;
+  // "length" cache
+  LEPUSAtom length_atom_;
 };
 
 // use quickjs enginer as lepus context
@@ -60,8 +67,6 @@ class QuickContext : private LEPUSRuntimeData,
   virtual void TriggerVmGC() override;
   virtual void UpdateGCTiming(bool is_start) override;
 
-  virtual long GetParamsSize() override;
-  virtual Value* GetParam(long index) override;
   virtual const std::string& name() const override;
   virtual bool UpdateTopLevelVariableByPath(base::Vector<std::string>& path,
                                             const lepus::Value& val) override;
@@ -70,9 +75,11 @@ class QuickContext : private LEPUSRuntimeData,
   virtual void ResetTopLevelVariable() override;
   virtual void ResetTopLevelVariableByVal(const Value& val) override;
 
-  virtual std::unique_ptr<lepus::Value> GetTopLevelVariable(
+  virtual lepus::Value GetTopLevelVariable(
       bool ignore_callable = false) override;
-  LEPUSContext* context() const override { return lepus_context_; }
+
+  LEPUSContext* context() const { return lepus_context_; }
+
   bool GetTopLevelVariableByName(const base::String& name,
                                  lepus::Value* ret) override;
 
@@ -86,11 +93,13 @@ class QuickContext : private LEPUSRuntimeData,
   void SetStackSize(uint32_t stack_size);
   void RegisterGlobalFunction(const char* name, LEPUSCFunction* func,
                               int argc = 0);
-  void RegisterGlobalFunction(const RenderBindingFunction* funcs, size_t size);
+  void RegisterGlobalFunction(const RenderBindingFunction* funcs,
+                              size_t size) override;
   void RegisterObjectFunction(lepus::Value& obj,
-                              const RenderBindingFunction* funcs, size_t size);
+                              const RenderBindingFunction* funcs,
+                              size_t size) override;
 
-  LEPUSValue NewBindingFunction(RenderBindingFunc func);
+  LEPUSValue NewBindingFunction(CFunction func);
 
   /**
    * @brief Called when the garbage collection (GC) operation is completed to
@@ -128,11 +137,8 @@ class QuickContext : private LEPUSRuntimeData,
   inline void set_napi_env(void* env) { napi_env_ = env; }
   inline void* napi_env() { return napi_env_; }
 
-  virtual void RegisterMethodToLynx() override;
-
   virtual void RegisterLepusVerion() override;
   void SetDebuggerSourceAndEndLine(const std::string& source);
-  LYNX_EXPORT_FOR_DEVTOOL LEPUSValue GetTopLevelFunction() const override;
 
   LEPUSValue ReportSetConstValueError(const LEPUSValue&, LEPUSValue);
 
@@ -150,7 +156,6 @@ class QuickContext : private LEPUSRuntimeData,
       const std::unordered_map<std::string, std::string>& info) override;
   void BeforeReportError(base::LynxError& error) override;
 
-  void RegisterCtxBuiltin(const tasm::ArchOption&) override;
   void ApplyConfig(const std::shared_ptr<tasm::PageConfig>&,
                    const tasm::CompileOptions&) override;
 
@@ -198,7 +203,7 @@ class QuickContext : private LEPUSRuntimeData,
 
 #if ENABLE_TRACE_PERFETTO
   void SetRuntimeProfiler(
-      std::shared_ptr<profile::RuntimeProfiler> runtime_profile);
+      std::shared_ptr<runtime::profile::RuntimeProfiler> runtime_profile);
   void RemoveRuntimeProfiler();
 #endif
 
@@ -210,7 +215,16 @@ class QuickContext : private LEPUSRuntimeData,
 
   virtual bool IsTracingGCEnabled() override;
 
+  static inline ContextCell* GetContextCellFromCtx(LEPUSContext* ctx) {
+    return ctx ? reinterpret_cast<ContextCell*>(LEPUS_GetContextOpaque(ctx))
+               : nullptr;
+  }
+
  private:
+  static LEPUSLepusRefCallbacks GetLepusRefCall();
+  static CellManager& GetContextCells();
+  static ContextCell* RegisterContextCell(lepus::QuickContext* qctx);
+
   virtual Value CallArgs(const base::String& name, const Value* args[],
                          size_t args_count,
                          bool pause_suppression_mode) override;
@@ -247,7 +261,7 @@ class QuickContext : private LEPUSRuntimeData,
 
   common::JSErrorReporter js_error_reporter_;
 #if ENABLE_TRACE_PERFETTO
-  std::shared_ptr<profile::RuntimeProfiler> runtime_profiler_;
+  std::shared_ptr<runtime::profile::RuntimeProfiler> runtime_profiler_;
 #endif
 };
 
@@ -269,4 +283,4 @@ class QuickContextBundle final : public ContextBundle {
 
 }  // namespace lepus
 }  // namespace lynx
-#endif  // CORE_RUNTIME_VM_LEPUS_QUICK_CONTEXT_H_
+#endif  // CORE_RUNTIME_LEPUSNG_QUICK_CONTEXT_H_

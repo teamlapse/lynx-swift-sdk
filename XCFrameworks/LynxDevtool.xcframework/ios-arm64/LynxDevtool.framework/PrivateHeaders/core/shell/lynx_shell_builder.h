@@ -76,7 +76,7 @@ class LynxShellBuilder {
           on_engine_actor_created);
 
   LynxShellBuilder& SetRuntimeActor(
-      const std::shared_ptr<LynxActor<runtime::LynxRuntime>>& runtime_actor);
+      const std::shared_ptr<LynxActor<BTSRuntime>>& runtime_actor);
 
   LynxShellBuilder& SetPerfControllerActor(
       const std::shared_ptr<
@@ -109,13 +109,6 @@ class LynxShellBuilder {
   LynxShell* build();
 
  private:
-  std::unique_ptr<lynx::shell::LynxEngine> CreateLynxEngine(
-      std::unique_ptr<TasmMediator> tasm_mediator,
-      base::TaskRunnerManufactor& runners,
-      const std::shared_ptr<LynxCardCacheDataManager>& card_cached_data_mgr,
-      int32_t instance_id, LynxShell* shell,
-      std::unique_ptr<lynx::tasm::LayoutCtxPlatformImpl>
-          platform_layout_context);
   void AttachLynxEngine(LynxShell* shell);
   //  void DetachLynxEngine()
 
@@ -154,7 +147,7 @@ class LynxShellBuilder {
   std::function<void(const std::shared_ptr<LynxActor<LynxEngine>>&)>
       on_engine_actor_created_;
 
-  std::shared_ptr<LynxActor<runtime::LynxRuntime>> runtime_actor_{};
+  std::shared_ptr<LynxActor<BTSRuntime>> runtime_actor_{};
   std::shared_ptr<LynxActor<tasm::performance::PerformanceController>>
       perf_controller_actor_{};
   std::unique_ptr<tasm::performance::PerformanceControllerPlatformImpl>

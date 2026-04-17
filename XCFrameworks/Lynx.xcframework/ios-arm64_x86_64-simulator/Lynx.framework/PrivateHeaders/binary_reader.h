@@ -1,8 +1,8 @@
 // Copyright 2019 The Lynx Authors. All rights reserved.
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
-#ifndef CORE_RUNTIME_VM_LEPUS_BINARY_READER_H_
-#define CORE_RUNTIME_VM_LEPUS_BINARY_READER_H_
+#ifndef CORE_RUNTIME_LEPUS_BINARY_READER_H_
+#define CORE_RUNTIME_LEPUS_BINARY_READER_H_
 
 #include <stdlib.h>
 
@@ -13,8 +13,9 @@
 #include <utility>
 #include <vector>
 
+#include "base/include/base_defines.h"
 #include "base/include/value/base_string.h"
-#include "core/runtime/vm/lepus/binary_input_stream.h"
+#include "core/runtime/lepus/binary_input_stream.h"
 
 #define ERROR_UNLESS_CODE(expr, code, errorCode)                    \
   do {                                                              \
@@ -49,12 +50,35 @@ class BinaryReader {
   BinaryReader(BinaryReader&&) = default;
   BinaryReader& operator=(BinaryReader&&) = default;
 
-  bool ReadU8(uint8_t* out_value);
-  bool ReadU32(uint32_t* out_value);
-  bool ReadCompactU32(uint32_t* out_value);
-  bool ReadCompactS32(int32_t* out_value);
-  bool ReadCompactU64(uint64_t* out_value);
-  bool ReadCompactD64(double* value);
+  BASE_INLINE bool ReadU32(uint32_t* out_value) {
+    return stream_->ReadUx<uint32_t>(out_value);
+  }
+
+  BASE_INLINE bool ReadU8(uint8_t* out_value) {
+    return stream_->ReadUx<uint8_t>(out_value);
+  }
+
+  BASE_INLINE bool ReadCompactU32(uint32_t* out_value) {
+    return stream_->ReadCompactU32(out_value);
+  }
+
+  BASE_INLINE bool ReadCompactS32(int32_t* out_value) {
+    return stream_->ReadCompactS32(out_value);
+  }
+
+  BASE_INLINE bool ReadCompactU64(uint64_t* out_value) {
+    return stream_->ReadCompactU64(out_value);
+  }
+
+  BASE_INLINE bool ReadCompactD64(double* out_value) {
+    uint64_t data = 0;
+    if (!stream_->ReadCompactU64(&data)) {
+      return false;
+    }
+    *out_value = base::BitCast<double>(data);
+    return true;
+  }
+
   bool ReadStringDirectly(std::string* out_value);
   bool ReadStringDirectly(base::String& out_value);
   void PrintError(const char* format, const char* func, int line);
@@ -76,4 +100,4 @@ class BinaryReader {
 }  // namespace lepus
 }  // namespace lynx
 
-#endif  // CORE_RUNTIME_VM_LEPUS_BINARY_READER_H_
+#endif  // CORE_RUNTIME_LEPUS_BINARY_READER_H_

@@ -1,13 +1,13 @@
 // Copyright 2022 The Lynx Authors. All rights reserved.
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
-#ifndef CORE_RUNTIME_VM_LEPUS_QJS_CALLBACK_H_
-#define CORE_RUNTIME_VM_LEPUS_QJS_CALLBACK_H_
+#ifndef CORE_RUNTIME_LEPUSNG_QJS_CALLBACK_H_
+#define CORE_RUNTIME_LEPUSNG_QJS_CALLBACK_H_
 
 #include <string>
 
-#include "core/runtime/vm/lepus/context.h"
-#include "core/runtime/vm/lepus/quick_context.h"
+#include "core/runtime/lepus/context.h"
+#include "core/runtime/lepusng/quick_context.h"
 namespace lynx {
 namespace lepus {
 
@@ -64,4 +64,4 @@ LEPUSValue LEPUSRefArraySlice(LEPUSContext* ctx, LEPUSValue this_val,
 }  // namespace lepus
 }  // namespace lynx
 
-#endif  // CORE_RUNTIME_VM_LEPUS_QJS_CALLBACK_H_
+#endif  // CORE_RUNTIME_LEPUSNG_QJS_CALLBACK_H_

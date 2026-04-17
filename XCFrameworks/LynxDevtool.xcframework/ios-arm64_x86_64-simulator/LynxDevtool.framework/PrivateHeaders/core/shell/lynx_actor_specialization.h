@@ -12,7 +12,6 @@
 #include "base/trace/native/trace_event.h"
 #include "core/base/lynx_trace_categories.h"
 #include "core/renderer/ui_wrapper/layout/layout_context.h"
-#include "core/runtime/piper/js/lynx_runtime.h"
 #include "core/services/event_report/event_tracker.h"
 #include "core/services/feature_count/feature_counter.h"
 #include "core/shell/lynx_engine.h"
@@ -21,8 +20,10 @@
 namespace lynx {
 namespace shell {
 
+class BTSRuntime;
+
 template <typename T>
-inline constexpr bool kIsLynxActor = std::is_same_v<T, runtime::LynxRuntime> ||
+inline constexpr bool kIsLynxActor = std::is_same_v<T, shell::BTSRuntime> ||
                                      std::is_same_v<T, shell::LynxEngine> ||
                                      std::is_same_v<T, shell::NativeFacade> ||
                                      std::is_same_v<T, tasm::LayoutContext>;
@@ -37,7 +38,7 @@ template <>
 inline constexpr const char* kActorTag<shell::LynxEngine> = "LynxEngine";
 
 template <>
-inline constexpr const char* kActorTag<runtime::LynxRuntime> = "LynxRuntime";
+inline constexpr const char* kActorTag<shell::BTSRuntime> = "BTSRuntime";
 
 template <>
 inline constexpr const char* kActorTag<tasm::LayoutContext> = "LayoutContext";

@@ -12,11 +12,14 @@ namespace lynx {
 namespace starlight {
 class BordersData;
 }
+namespace transforms {
+class Matrix44;
+}
 namespace tasm {
 
 class DisplayListBuilder {
  public:
-  DisplayListBuilder();
+  explicit DisplayListBuilder(float dx = 0, float dy = 0);
   ~DisplayListBuilder();
 
   DisplayListBuilder(const DisplayListBuilder&) = delete;
@@ -24,36 +27,50 @@ class DisplayListBuilder {
   DisplayListBuilder(DisplayListBuilder&&) = default;
   DisplayListBuilder& operator=(DisplayListBuilder&&) = default;
 
+  void Reserve(int32_t capacity);
+
   // Begin a new fragment
-  DisplayListBuilder& Begin(float x, float y, float width, float height);
+  DisplayListBuilder& Begin(int id, float x, float y, float width,
+                            float height);
 
   // End the current fragment
   DisplayListBuilder& End();
 
   // Fill with color
-  DisplayListBuilder& Fill(uint32_t color);
+  DisplayListBuilder& Fill(uint32_t color, int32_t clip_index = -1);
 
   // Draw a view
   DisplayListBuilder& DrawView(int view_id);
 
   // Apply transform
-  DisplayListBuilder& Transform(float a, float b, float c, float d, float e,
-                                float f);
-
-  // Apply clip
-  DisplayListBuilder& Clip(float x, float y, float width, float height);
+  DisplayListBuilder& Transform(const transforms::Matrix44& matrix);
+  DisplayListBuilder& Opacity(float alpha);
 
   // Retrieve Image source and draw
-  DisplayListBuilder& DrawImage(int image_id);
+  DisplayListBuilder& DrawImage(int32_t image_id, int32_t box_index);
 
   // Retrieve text source and draw
   DisplayListBuilder& DrawText(int text_id);
 
   // Set all border properties at once (color, width, style for all four sides)
-  DisplayListBuilder& Border(const starlight::BordersData& border);
+  DisplayListBuilder& Border(int32_t out_index, int32_t inner_index,
+                             const starlight::BordersData& border);
 
   // Set clip rect
   DisplayListBuilder& ClipRect(const RoundedRectangle& border);
+
+  // Record box model
+  DisplayListBuilder& RecordBoxModel(const RoundedRectangle& rect,
+                                     int32_t& index);
+
+  // Draw linear gradient
+  DisplayListBuilder& LinearGradient(float angle,
+                                     const base::Vector<uint32_t>& colors,
+                                     const base::Vector<float>& stops,
+                                     int32_t tiling_index, int32_t clip_index,
+                                     int32_t repeat_x, int32_t repeat_y);
+
+  DisplayListBuilder& MarkRootNeedClipBounds();
 
   // Build the final display list
   DisplayList Build();
@@ -63,6 +80,8 @@ class DisplayListBuilder {
 
  private:
   DisplayList display_list_;
+
+  int32_t current_index_of_box_model = 0;
 };
 
 }  // namespace tasm

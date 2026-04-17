@@ -23,10 +23,10 @@
 #include "core/public/lynx_resource_loader.h"
 #include "core/public/page_options.h"
 #include "core/renderer/data/template_data.h"
+#include "core/renderer/lynx_env_config.h"
 #include "core/renderer/ui_wrapper/common/prop_bundle_creator_default.h"
-#include "core/runtime/bindings/jsi/modules/lynx_module_manager.h"
-#include "core/runtime/piper/js/lynx_runtime.h"
-#include "core/runtime/piper/js/template_delegate.h"
+#include "core/runtime/js/bindings/modules/lynx_module_manager.h"
+#include "core/runtime/js/template_delegate.h"
 #include "core/services/performance/performance_controller.h"
 #include "core/services/performance/performance_mediator.h"
 #include "core/services/timing_handler/timing_handler.h"
@@ -39,8 +39,10 @@
 #include "core/shell/lynx_engine.h"
 #include "core/shell/lynx_engine_wrapper.h"
 #include "core/shell/native_facade.h"
+#include "core/shell/runtime/bts/bts_runtime.h"
 #include "core/shell/tasm_mediator.h"
 #include "core/shell/tasm_operation_queue.h"
+#include "core/shell/update_mode.h"
 
 namespace lynx {
 
@@ -49,6 +51,8 @@ class AirModuleHandler;
 }  // namespace air
 namespace tasm {
 class LynxTemplateBundle;
+class LazyBundleLoader;
+class WhiteBoard;
 }  // namespace tasm
 namespace piper {
 class NativeModuleFactory;
@@ -71,6 +75,21 @@ struct ShellOption {
   tasm::PageOptions page_options_;
 };
 
+struct LynxEngineBuildOptions {
+  tasm::LynxEnvConfig lynx_env_config_{0, 0, 1, 1};
+  std::shared_ptr<lynx::tasm::LazyBundleLoader> loader_;
+  std::shared_ptr<lynx::tasm::WhiteBoard> white_board_;
+  std::shared_ptr<base::VSyncMonitor> element_manager_vsync_monitor_;
+  bool enable_new_animator_{false};
+  bool enable_native_list_{false};
+  bool enable_pre_update_data_{false};
+  bool enable_unified_pipeline_{false};
+  bool use_invoke_ui_method_func_{false};
+  bool force_layout_on_background_thread_{false};
+  bool enable_layout_only_{true};
+  std::string locale_;
+};
+
 // support create and destroy in any thread
 class LynxShell {
  public:
@@ -85,8 +104,7 @@ class LynxShell {
       const std::shared_ptr<lynx::pub::LynxResourceLoader>& resource_loader,
       const std::shared_ptr<lynx::pub::LynxNativeModuleManager>&
           native_module_manager,
-      const std::function<
-          void(const std::shared_ptr<LynxActor<runtime::LynxRuntime>>&)>&
+      const std::function<void(const std::shared_ptr<LynxActor<BTSRuntime>>&)>&
           on_runtime_actor_created,
       std::vector<std::string> preload_js_paths, uint32_t runtime_flags,
       const std::string& bytecode_source_url,
@@ -102,7 +120,7 @@ class LynxShell {
   void StartJsRuntime();
 
   static void TriggerDestroyRuntime(
-      const std::shared_ptr<LynxActor<runtime::LynxRuntime>>& runtime_actor,
+      const std::shared_ptr<LynxActor<BTSRuntime>>& runtime_actor,
       std::string js_group_thread_name);
 
   // TODO(heshan): will be deleted after ios platform ready
@@ -159,7 +177,8 @@ class LynxShell {
   void UpdateGlobalProps(const lepus::Value& global_props);
 
   void UpdateMetaData(const std::shared_ptr<tasm::TemplateData>& data,
-                      const lepus::Value& global_props);
+                      const lepus::Value& global_props,
+                      LynxUpdateMode update_mode = LynxUpdateMode::UPDATE);
 
   void UpdateScreenMetrics(float width, float height, float device_pixel_ratio);
 
@@ -273,7 +292,7 @@ class LynxShell {
     return facade_actor_;
   }
 
-  std::shared_ptr<LynxActor<runtime::LynxRuntime>> GetRuntimeActor() {
+  std::shared_ptr<LynxActor<BTSRuntime>> GetRuntimeActor() {
     return runtime_actor_;
   }
 
@@ -380,8 +399,7 @@ class LynxShell {
 
   std::shared_ptr<ListEngineProxy> list_engine_proxy_;
 
-  std::shared_ptr<LynxActor<runtime::LynxRuntime>>
-      runtime_actor_;  // on JS runner
+  std::shared_ptr<LynxActor<BTSRuntime>> runtime_actor_;  // on JS runner
   std::shared_ptr<LynxActor<tasm::LayoutContext>>
       layout_actor_;  // on Layout runner
 
@@ -406,8 +424,7 @@ class LynxShell {
   LayoutMediator* layout_mediator_{nullptr};                        // NOT OWNED
   tasm::performance::PerformanceMediator* perf_mediator_{nullptr};  // NOT OWNED
 
-  std::function<void(std::unique_ptr<runtime::LynxRuntime>&)>
-      start_js_runtime_task_;
+  std::function<void(std::unique_ptr<BTSRuntime>&)> start_js_runtime_task_;
 
   // A SSR page will be rendered when LoadSSRData is called.
   // A ssr page will be further hydrated when a load template is called.
@@ -435,7 +452,14 @@ class LynxShell {
 
  private:
   friend class LynxEngineWrapper;
+  std::unique_ptr<lynx::shell::LynxEngine> BuildLynxEngine(
+      std::unique_ptr<TasmMediator> tasm_mediator,
+      std::unique_ptr<lynx::tasm::LayoutCtxPlatformImpl>
+          platform_layout_context,
+      std::unique_ptr<lynx::tasm::PaintingCtxPlatformImpl> painting_context);
+
   std::weak_ptr<piper::JsBundleHolder> GetWeakJsBundleHolder();
+  LynxEngineBuildOptions engine_build_options_;
 };
 
 }  // namespace shell

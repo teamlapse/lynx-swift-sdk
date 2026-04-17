@@ -191,6 +191,16 @@ typedef void (^LynxImageLoadCompletionBlock)(UIImage *_Nullable image, NSError *
 @optional
 - (void)setFrameCacheAutomatically:(id)view value:(BOOL)frameCacheAutomatically;
 
+/**
+ * Registers callbacks for animated image events (triggered after UIImage is ready),  including when
+ * the animation starts, completes a single loop, and finishes all configured loops.
+ *
+ * @param view The view containing the animated image.
+ * @param ui The LynxUIImage instance associated with the image.
+ */
+@optional
+- (void)registerAnimatedImageCallback:(id)view UI:(LynxUIImage *)ui;
+
 @end
 
 NS_ASSUME_NONNULL_END

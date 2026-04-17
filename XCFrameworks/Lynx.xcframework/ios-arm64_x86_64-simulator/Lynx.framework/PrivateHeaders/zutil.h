@@ -206,9 +206,15 @@ extern z_const char * const z_errmsg[10]; /* indexed by 2-zlib_error */
 /* provide prototypes for these when building zlib without LFS */
 #if !defined(_WIN32) && \
     (!defined(_LARGEFILE64_SOURCE) || _LFS64_LARGEFILE-0 == 0)
-    ZEXTERN uLong ZEXPORT adler32_combine64(uLong, uLong, z_off_t);
-    ZEXTERN uLong ZEXPORT crc32_combine64(uLong, uLong, z_off_t);
-    ZEXTERN uLong ZEXPORT crc32_combine_gen64(z_off_t);
+    /*
+     * On platforms where z_off64_t is a distinct type from z_off_t (e.g. macOS
+     * where z_off64_t is off_t), make sure the prototypes match the
+     * definitions in adler32.c and crc32.c, which always use z_off64_t for the
+     * 64-bit variants.
+     */
+    ZEXTERN uLong ZEXPORT adler32_combine64(uLong, uLong, z_off64_t);
+    ZEXTERN uLong ZEXPORT crc32_combine64(uLong, uLong, z_off64_t);
+    ZEXTERN uLong ZEXPORT crc32_combine_gen64(z_off64_t);
 #endif
 
         /* common defaults */

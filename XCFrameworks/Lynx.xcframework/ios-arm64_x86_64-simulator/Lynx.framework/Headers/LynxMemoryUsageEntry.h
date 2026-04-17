@@ -5,8 +5,12 @@
 #import "LynxPerformanceEntry.h"
 #import "LynxMemoryUsageItem.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface LynxMemoryUsageEntry : LynxPerformanceEntry
 @property(nonatomic, strong) NSNumber* sizeBytes;
 @property(nonatomic, strong) NSDictionary<NSString*, LynxMemoryUsageItem*>* detail;
 - (instancetype)initWithDictionary:(NSDictionary*)dictionary;
 @end
+
+NS_ASSUME_NONNULL_END

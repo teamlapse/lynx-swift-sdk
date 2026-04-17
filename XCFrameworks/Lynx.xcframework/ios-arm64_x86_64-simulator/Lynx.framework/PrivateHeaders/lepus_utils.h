@@ -2,13 +2,13 @@
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
 
-#ifndef CORE_RUNTIME_VM_LEPUS_LEPUS_UTILS_H_
-#define CORE_RUNTIME_VM_LEPUS_LEPUS_UTILS_H_
+#ifndef CORE_RUNTIME_LEPUS_LEPUS_UTILS_H_
+#define CORE_RUNTIME_LEPUS_LEPUS_UTILS_H_
 
 #include <map>
 #include <string>
 
-#include "core/runtime/vm/lepus/token.h"
+#include "core/runtime/lepus/token.h"
 
 namespace lynx {
 namespace lepus {
@@ -64,4 +64,4 @@ static inline bool IsPrimaryExpr(int token) {
 }  // namespace lepus
 }  // namespace lynx
 
-#endif  // CORE_RUNTIME_VM_LEPUS_LEPUS_UTILS_H_
+#endif  // CORE_RUNTIME_LEPUS_LEPUS_UTILS_H_

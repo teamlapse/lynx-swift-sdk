@@ -1,8 +1,8 @@
 // Copyright 2019 The Lynx Authors. All rights reserved.
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
-#ifndef CORE_RUNTIME_VM_LEPUS_LEPUS_GLOBAL_H_
-#define CORE_RUNTIME_VM_LEPUS_LEPUS_GLOBAL_H_
+#ifndef CORE_RUNTIME_LEPUS_LEPUS_GLOBAL_H_
+#define CORE_RUNTIME_LEPUS_LEPUS_GLOBAL_H_
 
 #include <memory>
 #include <string>
@@ -23,12 +23,7 @@ class Global {
 
   ~Global() = default;
 
-  inline Value* Get(std::size_t index) {
-    if (index < global_cnt_) {
-      return &global_content_[index];
-    }
-    return nullptr;
-  }
+  inline Value* Get(std::size_t index) { return &global_content_[index]; }
 
   int Search(const base::String& name) {
     auto iter = global_.find(name);
@@ -123,4 +118,4 @@ class JsonData {
 }  // namespace lepus
 }  // namespace lynx
 
-#endif  // CORE_RUNTIME_VM_LEPUS_LEPUS_GLOBAL_H_
+#endif  // CORE_RUNTIME_LEPUS_LEPUS_GLOBAL_H_

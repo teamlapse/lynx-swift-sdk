@@ -13,16 +13,17 @@
 #include "base/include/debug/lynx_assert.h"
 #include "base/include/flex_optional.h"
 #include "base/include/value/array.h"
+#include "core/base/lynx_export.h"
 #include "core/renderer/css/css_font_face_token.h"
 #include "core/renderer/css/css_fragment.h"
 #include "core/renderer/css/css_keyframes_token.h"
 #include "core/renderer/css/css_property.h"
 #include "core/renderer/css/css_value.h"
 #include "core/renderer/css/parser/css_parser_configs.h"
+#include "core/renderer/css/text_attributes.h"
 #include "core/renderer/starlight/style/css_type.h"
 #include "core/renderer/starlight/types/layout_unit.h"
 #include "core/style/shadow_data.h"
-#include "core/style/text_attributes.h"
 #include "core/style/transform_raw_data.h"
 #include "core/style/transition_data.h"
 
@@ -153,8 +154,8 @@ class CSSStyleUtils {
       const tasm::CssMeasureContext& context,
       const tasm::CSSParserConfigs& configs);
 
-  static bool IsLayoutRelatedTransform(
-      const std::pair<tasm::CSSPropertyID, tasm::CSSValue>& style);
+  static bool IsLayoutRelatedTransform(tasm::CSSPropertyID id,
+                                       const tasm::CSSValue& value);
 
   static lepus_value TransformToLepus(
       const base::Vector<TransformRawData>& items);
@@ -279,7 +280,7 @@ class CSSStyleUtils {
                                    const tasm::CssMeasureContext& context,
                                    const tasm::CSSParserConfigs& configs);
 
-  static lepus::Value GetGradientArrayFromString(
+  static LYNX_EXPORT lepus::Value GetGradientArrayFromString(
       const char* gradient_def, size_t gradient_def_length,
       const tasm::CssMeasureContext& context,
       const tasm::CSSParserConfigs& configs);

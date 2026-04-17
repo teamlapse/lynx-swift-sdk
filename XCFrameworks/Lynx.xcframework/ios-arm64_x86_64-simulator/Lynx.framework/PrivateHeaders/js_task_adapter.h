@@ -2,17 +2,19 @@
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
 
-#ifndef CORE_RUNTIME_BINDINGS_JSI_JS_TASK_ADAPTER_H_
-#define CORE_RUNTIME_BINDINGS_JSI_JS_TASK_ADAPTER_H_
+#ifndef CORE_RUNTIME_JS_BINDINGS_JS_TASK_ADAPTER_H_
+#define CORE_RUNTIME_JS_BINDINGS_JS_TASK_ADAPTER_H_
 
 #include <memory>
+#include <optional>
 #include <string>
+#include <tuple>
 #include <unordered_map>
 
 #include "base/include/closure.h"
 #include "base/include/thread/timed_task.h"
 #include "core/public/page_options.h"
-#include "core/runtime/jsi/jsi.h"
+#include "core/runtime/js/jsi/jsi.h"
 
 namespace lynx {
 namespace piper {
@@ -21,7 +23,6 @@ namespace piper {
 class JsTaskAdapter {
  public:
   explicit JsTaskAdapter(const std::weak_ptr<Runtime>& rt,
-                         const std::string& app_id,
                          const tasm::PageOptions& page_options);
   ~JsTaskAdapter();
 
@@ -30,19 +31,15 @@ class JsTaskAdapter {
   JsTaskAdapter(JsTaskAdapter&&) = default;
   JsTaskAdapter& operator=(JsTaskAdapter&&) = default;
 
-  piper::Value SetTimeout(
-      std::variant<std::unique_ptr<piper::Function>, double> id_or_callback,
-      int32_t delay, uint64_t trace_flow_id);
+  piper::Value SetTimeout(piper::Function func, int32_t delay,
+                          uint64_t trace_flow_id);
 
-  piper::Value SetInterval(
-      std::variant<std::unique_ptr<piper::Function>, double> id_or_callback,
-      int32_t delay, uint64_t trace_flow_id);
+  piper::Value SetInterval(piper::Function func, int32_t delay,
+                           uint64_t trace_flow_id);
 
   void RemoveTask(uint32_t task);
 
-  void QueueMicrotask(
-      std::variant<std::unique_ptr<piper::Function>, double> id_or_callback,
-      uint64_t trace_flow_id);
+  void QueueMicrotask(piper::Function func, uint64_t trace_flow_id);
 
   void SetPageOptions(const tasm::PageOptions& options) {
     page_options_ = options;
@@ -54,9 +51,8 @@ class JsTaskAdapter {
     kSetInterval,
     kQueueMicrotask,
   };
-  base::closure MakeTask(
-      std::variant<std::unique_ptr<piper::Function>, double> id_or_callback,
-      TaskType task_type, uint64_t trace_flow_id);
+  base::closure MakeTask(piper::Function func, TaskType task_type,
+                         uint64_t trace_flow_id);
 
   std::unique_ptr<base::TimedTaskManager> manager_;
   std::shared_ptr<std::unordered_map<uint64_t, base::closure>> micro_tasks_;
@@ -67,12 +63,10 @@ class JsTaskAdapter {
 
   std::weak_ptr<Runtime> rt_;
 
-  std::string app_id_;
-
   tasm::PageOptions page_options_;
 };
 
 }  // namespace piper
 }  // namespace lynx
 
-#endif  // CORE_RUNTIME_BINDINGS_JSI_JS_TASK_ADAPTER_H_
+#endif  // CORE_RUNTIME_JS_BINDINGS_JS_TASK_ADAPTER_H_

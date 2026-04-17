@@ -19,7 +19,7 @@ class WorkThreadExecutor;
 namespace socket_server {
 class UsbClientListener;
 
-static const char *kMessageQuit = "quit";
+extern const char *kMessageQuit;
 
 // Client of socket_server
 class UsbClient : public std::enable_shared_from_this<UsbClient> {
@@ -97,6 +97,7 @@ class UsbClient : public std::enable_shared_from_this<UsbClient> {
   base::SocketGuard socket_guard_;
   // mutex for close socket_fd_
   std::mutex mutex_;
+  std::atomic<bool> is_connected_ = {false};
 };
 
 }  // namespace socket_server

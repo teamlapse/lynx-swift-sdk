@@ -4,8 +4,14 @@
 #import <Foundation/Foundation.h>
 #import "LynxPerformanceEntry.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
+/// Deprecated: LoadBundleEntry and ReloadBundleEntry contain all properties of InitBackgroundRuntimeEntry
+__attribute__((deprecated("LoadBundleEntry and ReloadBundleEntry contain all properties of InitBackgroundRuntimeEntry")))
 @interface LynxInitBackgroundRuntimeEntry : LynxPerformanceEntry
 @property(nonatomic, strong) NSNumber* loadCoreStart;
 @property(nonatomic, strong) NSNumber* loadCoreEnd;
 - (instancetype)initWithDictionary:(NSDictionary*)dictionary;
 @end
+
+NS_ASSUME_NONNULL_END
